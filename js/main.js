@@ -8,15 +8,15 @@ let gameManager;
 
 // 게임 리소스 로드
 function preload() {
-  this.load.image('bg', '/assets/background.png');
-  this.load.image('player', '/assets/player.png');
+  this.load.image('bg', 'assets/background.png');
+  this.load.image('player', 'assets/player.png');
   this.load.image('bullet', 'https://labs.phaser.io/assets/sprites/bullet.png');
   this.load.image('enemyBullet', 'https://labs.phaser.io/assets/sprites/enemy-bullet.png');
-  this.load.image('enemy', '/assets/enemy.png');
-  this.load.image('king_enemy', '/assets/king_enemy.png');
-  this.load.image('king_king_enemy', '/assets/king_king_enemy.png');
-  this.load.image('coin', '/assets/coin.png');
-  this.load.image('powerup', '/assets/powerup.png');
+  this.load.image('enemy', 'assets/enemy.png');
+  this.load.image('king_enemy', 'assets/king_enemy.png');
+  this.load.image('king_king_enemy', 'assets/king_king_enemy.png');
+  this.load.image('coin', 'assets/coin.png');
+  this.load.image('powerup', 'assets/powerup.png');
 }
 
 // 게임 오브젝트 생성 및 초기화
