@@ -7,6 +7,7 @@ class GameManager {
 
   // 게임 상태 초기화
   resetGameState() {
+    // 기본 게임 상태 변수 초기화
     score = 0;
     distance = 0;
     lastKingSpawn = 0;
@@ -16,11 +17,150 @@ class GameManager {
     isDoubleBullet = false;
     doubleBulletEndTime = 0;
     isTouching = false;
+    gameState = 'start';
+
+    // 스폰 시스템 먼저 정지
+    if (this.scene.spawnSystem) {
+      this.scene.spawnSystem.stopSpawning();
+    }
+
+    // 물리 엔진 재시작
+    if (this.scene.physics) {
+      this.scene.physics.resume();
+    }
+
+    // 모든 게임 오브젝트 그룹 완전 초기화
+    this.clearAllObjects();
+
+    // 플레이어 초기화
+    if (player) {
+      player.setPosition(240, 700);
+      player.setVelocity(0, 0);
+      player.clearTint();
+      player.setVisible(false); // 시작 화면에서는 숨김
+      player.setScale(0.6);
+    }
+
+    // 배경 초기화
+    if (background) {
+      background.tilePositionY = 0;
+    }
+
+    // UI 텍스트 초기화
+    if (scoreText) {
+      scoreText.setText('Score: 0');
+      scoreText.setVisible(false);
+    }
+    if (distanceText) {
+      distanceText.setText('Distance: 0m');
+      distanceText.setVisible(false);
+    }
+
+    // 경고 오버레이 숨김
+    if (warningOverlay) {
+      warningOverlay.setVisible(false);
+    }
+
+    // 게임 오버 UI 숨김
+    if (gameOverText) {
+      gameOverText.setVisible(false);
+    }
+    if (restartButton) {
+      restartButton.setVisible(false);
+    }
+
+    // 모든 타이머와 이벤트 정리
+    this.clearAllTimers();
+  }
+
+  // 모든 게임 오브젝트 완전 제거
+  clearAllObjects() {
+    // 총알 그룹 완전 초기화
+    if (bullets) {
+      bullets.children.iterate((bullet) => {
+        if (bullet) bullet.destroy();
+      });
+      bullets.clear(true, true);
+    }
+
+    // 일반 적 그룹 완전 초기화
+    if (enemies) {
+      enemies.children.iterate((enemy) => {
+        if (enemy) {
+          // 체력바도 함께 제거
+          if (enemy.healthBarBg) enemy.healthBarBg.destroy();
+          if (enemy.healthBarFill) enemy.healthBarFill.destroy();
+          enemy.destroy();
+        }
+      });
+      enemies.clear(true, true);
+    }
+
+    // 킹 에너미 그룹 완전 초기화
+    if (kingEnemies) {
+      kingEnemies.children.iterate((kingEnemy) => {
+        if (kingEnemy) {
+          if (kingEnemy.healthBarBg) kingEnemy.healthBarBg.destroy();
+          if (kingEnemy.healthBarFill) kingEnemy.healthBarFill.destroy();
+          kingEnemy.destroy();
+        }
+      });
+      kingEnemies.clear(true, true);
+    }
+
+    // 킹킹 에너미 그룹 완전 초기화
+    if (kingKingEnemies) {
+      kingKingEnemies.children.iterate((kingKingEnemy) => {
+        if (kingKingEnemy) {
+          if (kingKingEnemy.healthBarBg) kingKingEnemy.healthBarBg.destroy();
+          if (kingKingEnemy.healthBarFill) kingKingEnemy.healthBarFill.destroy();
+          kingKingEnemy.destroy();
+        }
+      });
+      kingKingEnemies.clear(true, true);
+    }
+
+    // 적 총알 그룹 완전 초기화
+    if (enemyBullets) {
+      enemyBullets.children.iterate((enemyBullet) => {
+        if (enemyBullet) enemyBullet.destroy();
+      });
+      enemyBullets.clear(true, true);
+    }
+
+    // 동전 그룹 완전 초기화
+    if (coins) {
+      coins.children.iterate((coin) => {
+        if (coin) coin.destroy();
+      });
+      coins.clear(true, true);
+    }
+
+    // 파워업 그룹 완전 초기화
+    if (powerups) {
+      powerups.children.iterate((powerup) => {
+        if (powerup) powerup.destroy();
+      });
+      powerups.clear(true, true);
+    }
+  }
+
+  // 모든 타이머와 이벤트 정리
+  clearAllTimers() {
+    if (this.scene.time) {
+      // 모든 지연된 호출 제거
+      this.scene.time.removeAllEvents();
+    }
+
+    // 스폰 시스템의 타이머들도 정리
+    if (this.scene.spawnSystem) {
+      this.scene.spawnSystem.clearAllTimers();
+    }
   }
 
   // 배경 스크롤 및 거리 업데이트
   updateGameProgress() {
-    if (isGameOver) return;
+    if (isGameOver || gameState !== 'playing') return;
 
     // 배경 스크롤
     background.tilePositionY -= 2;
@@ -32,7 +172,7 @@ class GameManager {
 
   // 보스 스폰 체크
   checkBossSpawn() {
-    if (isGameOver) return;
+    if (isGameOver || gameState !== 'playing') return;
 
     const currentDistance = Math.floor(distance / 10);
     
@@ -51,7 +191,7 @@ class GameManager {
 
   // 화면 밖 오브젝트 정리
   cleanupOffscreenObjects() {
-    if (isGameOver) return;
+    if (isGameOver || gameState !== 'playing') return;
 
     // 총알 정리
     bullets.children.iterate((bullet) => {

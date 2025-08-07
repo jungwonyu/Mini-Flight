@@ -38,6 +38,7 @@ function create() {
   // 플레이어
   player = this.physics.add.sprite(240, 700, 'player').setScale(0.6);
   player.setCollideWorldBounds(true);
+  player.setVisible(false); // 시작 화면에서는 숨김
 
   // 게임 오브젝트 그룹 생성
   bullets = this.physics.add.group();
@@ -58,15 +59,16 @@ function create() {
   // 게임 오버 UI 생성
   createGameOverUI.call(this);
 
-  // 스폰 시작
-  startSpawning.call(this);
-
   // 충돌 처리 설정
   setupCollisions.call(this);
+
+  // HTML 시작 버튼 이벤트 연결
+  setupStartButton.call(this);
 }
 
 // 게임 업데이트 루프
 function update(time) {
+  if (gameState !== 'playing') return;
   if (isGameOver) return;
 
   // 각 시스템 업데이트
@@ -84,11 +86,47 @@ function createUIElements() {
     fontSize: '20px',
     fill: '#000000'
   });
+  scoreText.setVisible(false); // 게임 시작 전에는 숨김
 
   distanceText = this.add.text(480 - 10, 10, 'Distance: 0m', {
     fontSize: '20px',
     fill: '#000000'
   }).setOrigin(1, 0);
+  distanceText.setVisible(false); // 게임 시작 전에는 숨김
+}
+
+// HTML 시작 버튼 이벤트 연결
+function setupStartButton() {
+  const startButton = document.getElementById('startButton');
+  const startScreen = document.getElementById('startScreen');
+  
+  if (startButton) {
+    startButton.addEventListener('click', () => {
+      startGame.call(this);
+      startScreen.classList.add('hidden');
+    });
+  }
+}
+
+// 게임 시작 함수
+function startGame() {
+  // 완전한 게임 상태 초기화 (다시하기와 동일)
+  gameManager.resetGameState();
+  
+  // 게임 상태를 playing으로 변경
+  gameState = 'playing';
+  
+  // 게임 UI 표시
+  scoreText.setVisible(true);
+  distanceText.setVisible(true);
+  player.setVisible(true);
+  
+  // 게임 오버 UI 숨김
+  if (gameOverText) gameOverText.setVisible(false);
+  if (restartButton) restartButton.setVisible(false);
+  
+  // 스폰 시작
+  startSpawning.call(this);
 }
 
 // 게임 오버 UI 생성
@@ -111,19 +149,29 @@ function createGameOverUI() {
 
   // 다시하기 버튼 이벤트
   restartButton.on('pointerdown', () => {
+    // 완전한 게임 상태 초기화
     gameManager.resetGameState();
+    
+    // HTML 시작 화면 다시 표시
+    const startScreen = document.getElementById('startScreen');
+    if (startScreen) {
+      startScreen.classList.remove('hidden');
+    }
+    
+    // 씬 완전 재시작
     this.scene.restart();
   });
 }
 
 // 스폰 시작
 function startSpawning() {
-  // 각 스폰 시작
-  spawnSystem.spawnEnemies();
-  spawnSystem.spawnEnemyBullets();
+  // 스폰 시스템 시작
+  spawnSystem.startSpawning();
   
   // 첫 번째 파워업은 5초 후 (더 빠르게)
-  this.time.delayedCall(GAME_CONSTANTS.POWERUP_FIRST_SPAWN_DELAY, () => spawnSystem.spawnPowerup());
+  this.time.delayedCall(GAME_CONSTANTS.POWERUP_FIRST_SPAWN_DELAY, () => {
+    spawnSystem.spawnPowerup();
+  });
 }
 
 // 충돌 처리 설정

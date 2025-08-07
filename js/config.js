@@ -52,6 +52,7 @@ let lastKingSpawn = 0;
 let lastKingKingSpawn = 0;
 let lastFired = 0;
 let isGameOver = false;
+let gameState = 'start'; // 'start', 'playing', 'gameover'
 
 // 파워업 관련 변수들
 let isDoubleBullet = false;
@@ -89,7 +90,33 @@ const GAME_CONSTANTS = {
   
   // 보스 총알 발사 설정
   KING_FIRE_RATE: 2000,        // 킹 에너미 2초마다 발사
-  KING_KING_FIRE_RATE: 1000,   // 킹킹 에너미 1초마다 발사
+  KING_KING_FIRE_RATE: 2500,   // 킹킹 에너미 2초마다 발사
   KING_BULLET_SPEED: 200,      // 킹 에너미 총알 속도
-  KING_KING_BULLET_SPEED: 250  // 킹킹 에너미 총알 속도
+  KING_KING_BULLET_SPEED: 200  // 킹킹 에너미 총알 속도
+};
+
+// 게임 색상 상수들
+const GAME_COLORS = {
+  WHITE: 0xffffff,
+  RED: 0xff0000,
+  ORANGE: 0xff6600,
+  GREEN: 0x00ff00,
+  YELLOW: 0xffff00,
+  BLACK: 0x000000,
+  
+  // 적 타입별 색상
+  NORMAL_ENEMY: 0xffffff,
+  KING_ENEMY: 0xff6600,
+  KING_KING_ENEMY: 0xff0000,
+  
+  // 체력바 색상
+  HEALTH_HIGH: 0x00ff00,    // 초록색 (60% 이상)
+  HEALTH_MEDIUM: 0xffff00,  // 노란색 (30-60%)
+  HEALTH_LOW: 0xff0000,     // 빨간색 (30% 이하)
+  
+  // 효과 색상
+  HIT_EFFECT: 0xffffff,
+  POWERUP_EFFECT: 0xffffff,
+  PLAYER_POWERUP: 0x00ff00,
+  GAME_OVER: 0xff0000
 };

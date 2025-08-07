@@ -17,6 +17,7 @@
       -moz-user-select: none;
       -ms-user-select: none;
       user-select: none;
+      font-family: Arial, sans-serif;
     }
     canvas { 
       display: block; 
@@ -25,10 +26,102 @@
       max-height: 100vh;
       object-fit: contain;
     }
+
+    /* 시작 화면 스타일 */
+    #startScreen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+      color: white;
+      text-align: center;
+    }
+
+    #gameTitle {
+      font-size: 4rem;
+      font-weight: bold;
+      margin-bottom: 1rem;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+      background: linear-gradient(45deg, #fff, #add8e6);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    #subtitle {
+      font-size: 1.2rem;
+      margin-bottom: 3rem;
+      color: #cccccc;
+    }
+
+    #startButton {
+      background: linear-gradient(45deg, #4CAF50, #45a049);
+      border: none;
+      color: white;
+      padding: 15px 40px;
+      font-size: 1.5rem;
+      border-radius: 25px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(76, 175, 80, 0.4);
+      margin-bottom: 2rem;
+    }
+
+    #startButton:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(76, 175, 80, 0.6);
+    }
+
+    #controls {
+      font-size: 0.9rem;
+      color: #aaaaaa;
+      line-height: 1.5;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    /* 반응형 디자인 */
+    @media (max-width: 480px) {
+      #gameTitle {
+        font-size: 2.5rem;
+      }
+      #subtitle {
+        font-size: 1rem;
+        margin-bottom: 2rem;
+      }
+      #startButton {
+        font-size: 1.2rem;
+        padding: 12px 30px;
+      }
+      #controls {
+        font-size: 0.8rem;
+        padding: 0 20px;
+      }
+    }
   </style>
   <script src="https://cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser.js"></script>
 </head>
 <body>
+  <!-- 시작 화면 -->
+  <div id="startScreen">
+    <h1 id="gameTitle">MINI FLIGHT</h1>
+    <p id="subtitle">하늘을 날아 적들을 물리치세요!</p>
+    <button id="startButton">START</button>
+    <div id="controls">
+      PC: 키보드로 이동<br>
+      모바일: 터치로 이동 및 발사
+    </div>
+  </div>
+
 <script src="js/config.js"></script>
 <script src="js/spawn_system.js"></script>
 <script src="js/collision_system.js"></script>
