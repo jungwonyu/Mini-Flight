@@ -1,11 +1,7 @@
 // 충돌 처리 시스템
 
 class CollisionSystem {
-  constructor(scene) {
-    this.scene = scene;
-  }
-
-  // 적 타입별 설정
+  // 적 타입별 설정 반환 함수
   getEnemyConfig(enemyType) {
     const configs = {
       'normal': {
@@ -38,6 +34,9 @@ class CollisionSystem {
     };
     return configs[enemyType];
   }
+  constructor(scene) {
+    this.scene = scene;
+  }
 
   // 공통 적 충돌 처리
   hitEnemyCommon(bullet, enemy, enemyType) {
@@ -51,6 +50,11 @@ class CollisionSystem {
     
     // 타격 효과
     this.createHitEffect(enemy, config.tintColor);
+
+    // 적 피격 효과음 재생
+    if (this.scene.enemyHitSound) {
+      this.scene.enemyHitSound.play();
+    }
     
     // 체력에 따라 크기 조정
     const healthRatio = enemy.health / enemy.maxHealth;
@@ -95,6 +99,8 @@ class CollisionSystem {
     }, 100);
     
     this.updateScore(10);
+    // 효과음 재생
+    if (this.scene.coinSound) this.scene.coinSound.play();
   }
 
   // 파워업 수집
@@ -128,6 +134,8 @@ class CollisionSystem {
     });
     
     this.updateScore(10);
+    // 효과음 재생
+    if (this.scene.powerupSound) this.scene.powerupSound.play();
   }
 
   // 적 체력바 제거 공통 함수
@@ -155,19 +163,39 @@ class CollisionSystem {
     gameState = 'gameover';
     this.scene.physics.pause();
     player.setTint(GAME_COLORS.GAME_OVER);
-    
+
     // 진동 효과
     this.scene.cameras.main.shake(300, 0.015);
-    
-    // 게임 오버 UI 표시
-    gameOverText.setVisible(true);
-    gameOverText.setText('GAME OVER\n\nFinal Score: ' + score + '\nDistance: ' + Math.floor(distance / 10) + 'm');
-    
-    restartButton.setVisible(true);
-    
-    // 상단 텍스트 숨김
-    scoreText.setVisible(false);
-    distanceText.setVisible(false);
+
+    // Phaser UI 숨김
+    if (typeof scoreText !== 'undefined') scoreText.setVisible(false);
+    if (typeof distanceText !== 'undefined') distanceText.setVisible(false);
+
+    // HTML 게임 오버 화면 표시
+    const gameOverScreen = document.getElementById('gameOverScreen');
+    const gameOverInfo = document.getElementById('gameOverInfo');
+    const restartButton = document.getElementById('restartButton');
+    const startScreen = document.getElementById('startScreen');
+    if (gameOverScreen && gameOverInfo && restartButton) {
+      gameOverInfo.innerHTML = `Final Score: <b>${score}</b><br>Distance: <b>${Math.floor(distance / 10)}m</b>`;
+      gameOverScreen.classList.remove('hidden');
+
+      // 다시하기 버튼 이벤트 연결 (중복 방지)
+      restartButton.onclick = () => {
+        gameOverScreen.classList.add('hidden');
+        if (startScreen) startScreen.classList.remove('hidden');
+        this.scene.scene.restart();
+      };
+    }
+    // 게임 오버 효과음 재생
+    if (this.scene.gameOverSound) {
+      this.scene.gameOverSound.play();
+    }
+
+    // 배경음악 정지
+    if (this.scene.bgm && this.scene.bgm.isPlaying) {
+      this.scene.bgm.stop();
+    }
   }
 
   // 체력바 업데이트
@@ -207,6 +235,8 @@ class CollisionSystem {
     
     this.updateScore(scoreValue);
     enemy.destroy();
+    // 효과음 재생
+    if (this.scene.explosionSound) this.scene.explosionSound.play();
   }
 
   // 동전 드랍 공통 함수

@@ -17,6 +17,12 @@ function preload() {
   this.load.image('king_king_enemy', 'assets/king_king_enemy.png');
   this.load.image('coin', 'assets/coin.png');
   this.load.image('powerup', 'assets/powerup.png');
+  this.load.audio('coinSound', 'assets/coin.wav');
+  this.load.audio('explosionSound', 'assets/explosion.wav');
+  this.load.audio('powerupSound', 'assets/powerup.wav');
+  this.load.audio('bgm', 'assets/bgm.ogg');
+  this.load.audio('gameOverSound', 'assets/gameover.wav');
+  this.load.audio('enemyHitSound', 'assets/enemyhit.mp3');
 }
 
 // 게임 오브젝트 생성 및 초기화
@@ -31,6 +37,16 @@ function create() {
   this.spawnSystem = spawnSystem;
   this.collisionSystem = collisionSystem;
   this.gameManager = gameManager;
+
+    // 효과음 객체 생성 및 저장
+  this.coinSound = this.sound.add('coinSound');
+  this.explosionSound = this.sound.add('explosionSound');
+  this.powerupSound = this.sound.add('powerupSound');
+  this.gameOverSound = this.sound.add('gameOverSound');
+  this.enemyHitSound = this.sound.add('enemyHitSound');
+
+  // 배경 음악 객체 생성만 (재생은 start 버튼에서)
+  this.bgm = this.sound.add('bgm', { loop: true, volume: 0.5 });
 
   // 배경
   background = this.add.tileSprite(0, 0, 480, 800, 'bg').setOrigin(0);
@@ -57,7 +73,7 @@ function create() {
   warningOverlay.setVisible(false);
 
   // 게임 오버 UI 생성
-  createGameOverUI.call(this);
+  // createGameOverUI.call(this);
 
   // 충돌 처리 설정
   setupCollisions.call(this);
@@ -127,40 +143,11 @@ function startGame() {
   
   // 스폰 시작
   startSpawning.call(this);
-}
 
-// 게임 오버 UI 생성
-function createGameOverUI() {
-  gameOverText = this.add.text(240, 350, 'GAME OVER', {
-    fontSize: '30px',
-    fill: '#ff0000',
-    fontWeight: 'bold',
-    stroke: '#ffffff',
-    strokeThickness: 4
-  }).setOrigin(0.5).setVisible(false).setDepth(1000);
-
-  restartButton = this.add.text(240, 450, '다시하기', {
-    fontSize: '24px',
-    fill: '#ffffff',
-    backgroundColor: '#4CAF50',
-    padding: { x: 20, y: 10 },
-    borderRadius: 5
-  }).setOrigin(0.5).setVisible(false).setInteractive().setDepth(1000);
-
-  // 다시하기 버튼 이벤트
-  restartButton.on('pointerdown', () => {
-    // 완전한 게임 상태 초기화
-    gameManager.resetGameState();
-    
-    // HTML 시작 화면 다시 표시
-    const startScreen = document.getElementById('startScreen');
-    if (startScreen) {
-      startScreen.classList.remove('hidden');
+    // 배경음악 재생 (이미 재생 중이면 중복 방지)
+    if (this.bgm && !this.bgm.isPlaying) {
+      this.bgm.play();
     }
-    
-    // 씬 완전 재시작
-    this.scene.restart();
-  });
 }
 
 // 스폰 시작
