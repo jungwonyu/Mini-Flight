@@ -52,7 +52,7 @@ let lastKingSpawn = 0;
 let lastKingKingSpawn = 0;
 let lastFired = 0;
 let isGameOver = false;
-let gameState = 'start'; // 'start', 'playing', 'gameover'
+let gameState = 'start';
 
 // 파워업 관련 변수들
 let isDoubleBullet = false;
@@ -80,8 +80,8 @@ const GAME_CONSTANTS = {
 
   // 파워업 스폰 설정
   POWERUP_MIN_SPAWN_TIME: 8000,   // 최소 8초
-  POWERUP_MAX_SPAWN_TIME: 15000,  // 최대 15초 (기존 15-25초에서 단축)
-  POWERUP_FIRST_SPAWN_DELAY: 5000, // 첫 파워업 5초 후 (기존 10초에서 단축)
+  POWERUP_MAX_SPAWN_TIME: 15000,  // 최대 15초
+  POWERUP_FIRST_SPAWN_DELAY: 5000, // 첫 파워업 5초 후
 
   // 적 체력 설정
   ENEMY_HEALTH: 2,
@@ -90,7 +90,7 @@ const GAME_CONSTANTS = {
   
   // 보스 총알 발사 설정
   KING_FIRE_RATE: 2000,        // 킹 에너미 2초마다 발사
-  KING_KING_FIRE_RATE: 2500,   // 킹킹 에너미 2초마다 발사
+  KING_KING_FIRE_RATE: 2500,   // 킹킹 에너미 2.5초마다 발사
   KING_BULLET_SPEED: 200,      // 킹 에너미 총알 속도
   KING_KING_BULLET_SPEED: 200  // 킹킹 에너미 총알 속도
 };

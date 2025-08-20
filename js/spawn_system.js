@@ -7,7 +7,7 @@ class SpawnSystem {
     this.bulletTimer = null;
     this.powerupTimer = null;
     this.isActive = false;
-    this.hasPowerupActive = false; // 파워업이 화면에 있는지 추적
+    this.hasPowerupActive = false;
   }
 
   // 스폰 시스템 시작
@@ -25,8 +25,8 @@ class SpawnSystem {
   }
 
   // 공통: 체력바 생성
-  createHealthBar(x, y, width, height, bgAlpha = 0.7, fillColor = 0x00ff00) {
-    const healthBarBg = this.scene.add.rectangle(x, y, width, height, 0x000000, bgAlpha);
+  createHealthBar(x, y, width, height, bgAlpha = 0.7, fillColor = GAME_COLORS.GREEN) {
+    const healthBarBg = this.scene.add.rectangle(x, y, width, height, GAME_COLORS.BLACK, bgAlpha);
     const healthBarFill = this.scene.add.rectangle(x, y, width, height - 2, fillColor);
     return { healthBarBg, healthBarFill };
   }
@@ -61,7 +61,7 @@ class SpawnSystem {
     return null;
   }
 
-  // 겹치지 않는 위치 찾기 (화면의 기존 적들과도 비교)
+  // 겹치지 않는 위치 찾기
   findNonOverlappingPosition(existingPositions, minDistance = 80) {
     let attempts = 0;
     let x;
@@ -159,7 +159,7 @@ class SpawnSystem {
     
     this.createWarningEffect(0.6, 200, 4, () => {
       const kingEnemy = kingEnemies.create(240, -50, 'king_enemy');
-      this.setupEnemy(kingEnemy, 240, -50, 1.0, 100, 0xff6600, GAME_CONSTANTS.KING_ENEMY_HEALTH);
+      this.setupEnemy(kingEnemy, 240, -50, 1.0, 100, GAME_COLORS.ORANGE, GAME_CONSTANTS.KING_ENEMY_HEALTH);
       
       // 체력바 생성
       const { healthBarBg, healthBarFill } = this.createHealthBar(240, -20, 100, 8);
@@ -185,7 +185,7 @@ class SpawnSystem {
     const speed = GAME_CONSTANTS.KING_BULLET_SPEED;
     
     const kingBullet = this.createBullet(
-      kingEnemy.x, kingEnemy.y + 25, 1.5, 0xff6600,
+      kingEnemy.x, kingEnemy.y + 25, 1.5, GAME_COLORS.ORANGE,
       Math.cos(angle) * speed, Math.sin(angle) * speed, 270
     );
     
@@ -201,10 +201,10 @@ class SpawnSystem {
     
     this.createWarningEffect(0.8, 300, 6, () => {
       const kingKingEnemy = kingKingEnemies.create(240, -50, 'king_king_enemy');
-      this.setupEnemy(kingKingEnemy, 240, -50, 1.5, 80, 0xff0000, GAME_CONSTANTS.KING_KING_ENEMY_HEALTH);
+      this.setupEnemy(kingKingEnemy, 240, -50, 1.5, 80, GAME_COLORS.RED, GAME_CONSTANTS.KING_KING_ENEMY_HEALTH);
       
       // 체력바 생성
-      const { healthBarBg, healthBarFill } = this.createHealthBar(240, -20, 150, 12, 0.8, 0xff0000);
+      const { healthBarBg, healthBarFill } = this.createHealthBar(240, -20, 150, 12, 0.8, GAME_COLORS.RED);
       kingKingEnemy.healthBarBg = healthBarBg;
       kingKingEnemy.healthBarFill = healthBarFill;
       
@@ -219,19 +219,16 @@ class SpawnSystem {
   startKingKingEnemyFiring(kingKingEnemy) {
     if (!kingKingEnemy || !kingKingEnemy.active || isGameOver) return;
     
-    // 아래쪽 부채꼴 모양으로 10개 총알 발사
-    for (let i = 0; i < 10; i++) {
-      // 아래쪽 부채꼴 각도 (30도 ~ 150도 사이, 아래 방향만)
-      const angle = Phaser.Math.DegToRad(30 + (i * 13.33)); // 30, 43.33, 56.66, 70, 83.33, 96.66, 110, 123.33, 136.66, 150도
+    // 아래쪽 부채꼴 모양으로 10개 총알 발사 (30도 ~ 150도 사이, 아래 방향만)
+    for (let i = 0; i < 10; i++) { 
+      const angle = Phaser.Math.DegToRad(30 + (i * 13.33));
       const speed = GAME_CONSTANTS.KING_KING_BULLET_SPEED;
       
       this.createBullet(
-        kingKingEnemy.x, kingKingEnemy.y + 30, 2, 0xff0000,
+        kingKingEnemy.x, kingKingEnemy.y + 30, 2, GAME_COLORS.RED,
         Math.cos(angle) * speed, Math.sin(angle) * speed, 360
       );
     }
-    
-    // 반복 호출 제거 - 한 번만 발사
   }
 
   // 파워업 스폰
@@ -263,9 +260,9 @@ class SpawnSystem {
     const powerup = powerups.create(x, -30, 'powerup');
     powerup.setScale(2);
     powerup.setVelocityY(120);
-    powerup.setTint(0x00ff00);
+    powerup.setTint(GAME_COLORS.GREEN);
     
-    // 파워업이 제거될 때 플래그 리셋하는 이벤트 추가
+    // 파워업이 제거될 때 플래그 리셋
     powerup.on('destroy', () => {
       this.hasPowerupActive = false;
     });
@@ -326,26 +323,30 @@ class SpawnSystem {
   // 모든 타이머 정리
   clearAllTimers() {
     this.isActive = false;
-    this.hasPowerupActive = false; // 파워업 상태도 초기화
+    this.hasPowerupActive = false;
     
     // 개별 타이머 제거
     if (this.enemyTimer) {
       this.enemyTimer.remove();
       this.enemyTimer = null;
     }
+
     if (this.bulletTimer) {
       this.bulletTimer.remove();
       this.bulletTimer = null;
     }
+
     if (this.powerupTimer) {
       this.powerupTimer.remove();
       this.powerupTimer = null;
     }
     
-    // 스폰 시스템의 모든 지연된 호출과 트윈 정리
+    // 스폰 시스템의 모든 지연된 호출 정리
     if (this.scene.time) {
       this.scene.time.removeAllEvents();
     }
+
+    // 모든 트윈 애니메이션 정리
     if (this.scene.tweens) {
       this.scene.tweens.killAll();
     }

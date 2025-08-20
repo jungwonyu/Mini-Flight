@@ -72,9 +72,6 @@ function create() {
   warningOverlay = this.add.rectangle(240, 400, 480, 800, 0xff0000, 0.3);
   warningOverlay.setVisible(false);
 
-  // 게임 오버 UI 생성
-  // createGameOverUI.call(this);
-
   // 충돌 처리 설정
   setupCollisions.call(this);
 
@@ -137,13 +134,9 @@ function startGame() {
   distanceText.setVisible(true);
   player.setVisible(true);
   
-  // 게임 오버 UI 숨김
-  if (gameOverText) gameOverText.setVisible(false);
-  if (restartButton) restartButton.setVisible(false);
   
   // 스폰 시작
   startSpawning.call(this);
-
     // 배경음악 재생 (이미 재생 중이면 중복 방지)
     if (this.bgm && !this.bgm.isPlaying) {
       this.bgm.play();

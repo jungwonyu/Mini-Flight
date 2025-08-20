@@ -37,7 +37,7 @@ class GameManager {
       player.setPosition(240, 700);
       player.setVelocity(0, 0);
       player.clearTint();
-      player.setVisible(false); // 시작 화면에서는 숨김
+      player.setVisible(false);
       player.setScale(0.6);
     }
 

@@ -1,7 +1,6 @@
 // 충돌 처리 시스템
 
 class CollisionSystem {
-  // 적 타입별 설정 반환 함수
   getEnemyConfig(enemyType) {
     const configs = {
       'normal': {
