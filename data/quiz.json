@@ -1,0 +1,22 @@
+[
+  {
+    "question": "3 + 8 = ?",
+    "answer": "11"
+  },
+  {
+    "question": "15 - 7 = ?",
+    "answer": "8"
+  },
+  {
+    "question": "4 x 6 = ?",
+    "answer": "24"
+  },
+  {
+    "question": "18 ÷ 3 = ?",
+    "answer": "6"
+  },
+  {
+    "question": "10 + 9 = ?",
+    "answer": "19"
+  }
+]

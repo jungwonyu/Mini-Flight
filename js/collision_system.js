@@ -1,13 +1,140 @@
 // 충돌 처리 시스템
 
 class CollisionSystem {
+  // 킹/킹킹 enemy 죽으면 키 드랍
+  dropKey(x, y) {
+    if (typeof keys === 'undefined' || !keys) {
+      keys = this.scene.physics.add.group();
+    }
+    // 포션과 겹치지 않게 x 위치를 랜덤하게 조정
+    const keyX = Phaser.Math.Between(60, 420);
+    const keyY = y - Phaser.Math.Between(30, 80); // 포션보다 위쪽에서 시작
+    const keyObj = keys.create(keyX, keyY, 'key');
+    keyObj.setScale(0.7).setVelocityY(260); // 더 빠른 속도
+    keyObj.setDepth(5);
+    keyObj.isInventory = false;
+    // 반짝임 효과
+    this.scene.tweens.add({
+      targets: keyObj,
+      alpha: 0.5,
+      duration: 400,
+      yoyo: true,
+      repeat: -1,
+      ease: 'Sine.easeInOut'
+    });
+    // 회전 효과
+    keyObj.setAngularVelocity(180);
+    return keyObj;
+  }
+
+  // 키와 충돌 시 인벤토리(왼쪽 하단)에 추가
+  collectKey(player, keyObj) {
+    keyObj.disableBody(true, true);
+    // 키 인벤토리 숫자 증가
+    if (typeof keyInventoryCount === 'undefined') keyInventoryCount = 0;
+    keyInventoryCount++;
+    if (typeof keyInventoryText !== 'undefined' && keyInventoryText) {
+      keyInventoryText.setText(keyInventoryCount);
+    }
+  }
+
+  // 포션 수집 시 무적 상태 부여
+  collectPotion(player, potion) {
+    potion.setAlpha(0.7);
+    setTimeout(() => {
+      if (potion && potion.active) potion.destroy();
+    }, 100);
+
+    isPlayerInvincible = true;
+    player.setTint(GAME_COLORS.PLAYER_INVINCIBLE);
+    if (this.scene.feverSound) {
+      this.scene.bgm.stop();
+      this.scene.feverSound.play();
+    }
+    // 피버타임 시작
+    isFeverTime = true;
+    // 배경을 피버타임용으로 변경
+    if (typeof background !== 'undefined' && background && !background.isFever) {
+      background.setTexture('bg_fever');
+      background.isFever = true;
+    }
+    // 피버타임 코인 비 효과 시작
+    if (this.scene.spawnSystem && typeof this.scene.spawnSystem.startFeverTimeCoinRain === 'function') {
+      this.scene.spawnSystem.startFeverTimeCoinRain();
+    }
+
+    // 5초 후 무적 해제
+    this.scene.time.delayedCall(5000, () => {
+      isPlayerInvincible = false;
+      isFeverTime = false;
+      if (player && player.active) player.clearTint();
+      // 피버타임 종료 시 배경 복구
+      if (typeof background !== 'undefined' && background && background.isFever) {
+        background.setTexture('bg');
+        background.isFever = false;
+      }
+      // 피버타임 종료 시 화면의 모든 동전 제거
+      if (typeof coins !== 'undefined' && coins) {
+        coins.children.iterate((coin) => {
+          if (coin && coin.active) {
+            // '뿅!' 애니메이션: 스케일 업 + 페이드 아웃 후 destroy
+            this.scene.tweens.add({
+              targets: coin,
+              scale: 1.2,
+              alpha: 0,
+              duration: 250,
+              onComplete: () => {
+                coin.destroy();
+              }
+            });
+          }
+        });
+      }
+
+      // 피버사운드 종료
+      if (this.scene.feverSound) {
+        this.scene.feverSound.stop();
+        this.scene.bgm.play();
+      }
+    });
+  }
+
+  // 킹/킹킹 enemy가 죽었을 때 포션 드랍 (한 번만)
+  dropPotion(x, y) {
+    // 이미 화면에 포션이 있으면 드랍하지 않음
+    let activePotions = 0;
+    if (typeof potions !== 'undefined' && potions) {
+      potions.children.iterate((potion) => {
+        if (potion && potion.active) activePotions++;
+      });
+    }
+    if (activePotions > 0) return;
+    // 포션 그룹이 없으면 생성
+    if (typeof potions === 'undefined' || !potions) {
+      potions = this.scene.physics.add.group();
+    }
+  const potion = potions.create(x, y, 'potion');
+    potion.setScale(0.6);
+    potion.setVelocityY(120);
+    // 반짝임 효과
+    this.scene.tweens.add({
+      targets: potion,
+      alpha: 0.5,
+      duration: 500,
+      yoyo: true,
+      repeat: -1,
+      ease: 'Sine.easeInOut'
+    });
+    // 회전 효과
+    potion.setAngularVelocity(360);
+  }
   getEnemyConfig(enemyType) {
     const configs = {
       'normal': {
         healthBarWidth: 60,
         tintColor: GAME_COLORS.NORMAL_ENEMY,
         baseScale: 0.4,
-        scaleMultiplier: 0.1,
+        scaleMultiplier: 0.05, // 더 크게 줄어듦
         coinDrop: 1,
         destroyScore: 5,
         hitScore: 2
@@ -16,7 +143,7 @@ class CollisionSystem {
         healthBarWidth: 100,
         tintColor: GAME_COLORS.KING_ENEMY,
         baseScale: 0.8,
-        scaleMultiplier: 0.2,
+        scaleMultiplier: 0.2, // 더 크게 줄어듦
         coinDrop: 5,
         destroyScore: 100,
         hitScore: 5
@@ -25,7 +152,7 @@ class CollisionSystem {
         healthBarWidth: 150,
         tintColor: GAME_COLORS.KING_KING_ENEMY,
         baseScale: 1.2,
-        scaleMultiplier: 0.3,
+        scaleMultiplier: 0.2,
         coinDrop: 10,
         destroyScore: 300,
         hitScore: 8
@@ -57,7 +184,7 @@ class CollisionSystem {
     
     // 체력에 따라 크기 조정
     const healthRatio = enemy.health / enemy.maxHealth;
-    enemy.setScale(config.baseScale + (healthRatio * config.scaleMultiplier));
+    enemy.setScale(config.baseScale + (healthRatio * config.scaleMultiplier)); 
     
     if (enemy.health <= 0) {
       this.destroyEnemy(enemy, config.coinDrop, config.destroyScore);
@@ -85,6 +212,10 @@ class CollisionSystem {
   updateScore(points) {
     score += points;
     scoreText.setText('Score: ' + score);
+    // 게임 오버 횟수도 업데이트
+    if (typeof gameOverCountText !== 'undefined' && gameOverCountText) {
+      gameOverCountText.setText('Game Over: ' + gameOverCount);
+    }
   }
 
   // 동전 수집
@@ -145,6 +276,12 @@ class CollisionSystem {
 
   // 플레이어 충돌 (적과)
   playerHit(player, enemy) {
+    if (typeof isPlayerInvincible !== 'undefined' && isPlayerInvincible) {
+      // 무적 상태면 적만 제거, 플레이어는 영향 없음
+      enemy.destroy();
+      this.removeEnemyHealthBar(enemy);
+      return;
+    }
     enemy.destroy();
     this.removeEnemyHealthBar(enemy);
     this.gameOver(player);
@@ -152,14 +289,24 @@ class CollisionSystem {
 
   // 플레이어 총알 충돌
   playerHitByBullet(player, enemyBullet) {
+    if (typeof isPlayerInvincible !== 'undefined' && isPlayerInvincible) {
+      // 무적 상태면 총알만 제거, 플레이어는 영향 없음
+      enemyBullet.destroy();
+      return;
+    }
     enemyBullet.destroy();
     this.gameOver(player);
   }
 
   // 게임 오버 처리
   gameOver(player) {
+    // 기록은 유지, 물리 pause만 하고 UI 숨김 및 팝업만 띄움
     isGameOver = true;
     gameState = 'gameover';
+    gameOverCount++;
+    if (typeof gameOverCountText !== 'undefined' && gameOverCountText) {
+      gameOverCountText.setText('Game Over: ' + gameOverCount);
+    }
     this.scene.physics.pause();
     player.setTint(GAME_COLORS.GAME_OVER);
 
@@ -167,23 +314,169 @@ class CollisionSystem {
     this.scene.cameras.main.shake(300, 0.015);
 
     // Phaser UI 숨김
-    if (typeof scoreText !== 'undefined') scoreText.setVisible(false);
-    if (typeof distanceText !== 'undefined') distanceText.setVisible(false);
+    // if (typeof scoreText !== 'undefined') scoreText.setVisible(false);
+    // if (typeof distanceText !== 'undefined') distanceText.setVisible(false);
 
     // HTML 게임 오버 화면 표시
     const gameOverScreen = document.getElementById('gameOverScreen');
     const gameOverInfo = document.getElementById('gameOverInfo');
-    const restartButton = document.getElementById('restartButton');
     const startScreen = document.getElementById('startScreen');
-    if (gameOverScreen && gameOverInfo && restartButton) {
+    const finalOverScreen = document.getElementById('finalOverScreen');
+    const restartButtons = document.querySelectorAll('.restartButton');
+    const retryButtons = document.querySelectorAll('.retryButton');
+
+    // 퀴즈 화면
+    const quizScreen = document.getElementById('quizScreen');
+    const submitButton = document.getElementById('submitButton');
+    const questionElement = quizScreen.querySelector('.question');
+    const answerElement = quizScreen.querySelector('.userAnswer input');
+
+    // 오답 화면
+    const wrongAnswerScreen = document.getElementById('wrongAnswerScreen');
+    const wrongAnswerInfo = document.getElementById('wrongAnswerInfo');
+
+    let quizData = [];
+
+    fetch('data/quiz.json')
+      .then(response => response.json())
+      .then(data => {
+        quizData = data; // 퀴즈 데이터 저장
+        // 이후 quizData를 활용해 문제 화면 구성 등 가능
+      })
+      .catch(error => {
+        console.error('퀴즈 데이터 로드 실패:', error);
+      });
+
+    if (gameOverScreen && gameOverInfo && restartButtons && retryButtons) {
       gameOverInfo.innerHTML = `Final Score: <b>${score}</b><br>Distance: <b>${Math.floor(distance / 10)}m</b>`;
       gameOverScreen.classList.remove('hidden');
 
       // 다시하기 버튼 이벤트 연결 (중복 방지)
-      restartButton.onclick = () => {
-        gameOverScreen.classList.add('hidden');
-        if (startScreen) startScreen.classList.remove('hidden');
-        this.scene.scene.restart();
+      restartButtons.forEach(btn => {
+        btn.onclick = () => {
+          if (this.scene.buttonSound) this.scene.buttonSound.play();
+          wrongAnswerScreen.classList.add('hidden');
+          gameOverScreen.classList.add('hidden');
+          finalOverScreen.classList.add('hidden');
+          if (startScreen) startScreen.classList.remove('hidden');
+          gameOverCount = 0;
+          this.scene.scene.restart();
+        };
+      });
+
+      // 이어서 하기
+      retryButtons.forEach(btn => {
+        btn.onclick = () => {
+          if (this.scene.buttonSound) this.scene.buttonSound.play();
+          // 키 인벤토리 숫자 감소 (gameOverCount만큼)
+          if (typeof keyInventoryCount === 'undefined') keyInventoryCount = 0;
+          if (keyInventoryCount < gameOverCount) {
+            quizScreen.classList.add('hidden');
+            wrongAnswerScreen.classList.add('hidden');
+            finalOverScreen.classList.remove('hidden');
+            return;
+          }
+          keyInventoryCount -= gameOverCount;
+          if (typeof keyInventoryText !== 'undefined' && keyInventoryText) {
+            keyInventoryText.setText(keyInventoryCount);
+          }
+
+          // 문제 풀이 화면 보여주기
+          wrongAnswerScreen.classList.add('hidden');
+          quizScreen.classList.remove('hidden');
+
+          // 퀴즈와 정답 넣기
+          answerElement.value = '';
+          // const randomNum = quizData 길이 중 랜덤 숫자
+          const randomNum = Phaser.Math.Between(0, quizData.length - 1);
+          const randomQuiz = quizData[randomNum];
+          questionElement.textContent = randomQuiz.question; // 랜덤 문제 보여주기
+          answerElement.setAttribute('data-answer', randomQuiz.answer); // 정답 저장
+        };
+      });
+
+      submitButton.onclick = () => {
+        if (this.scene.buttonSound) this.scene.buttonSound.play();
+        // 정답 체크
+        const userAnswer = answerElement.value;
+
+        if (userAnswer === answerElement.getAttribute('data-answer')) { // 정답인 경우
+          const countdownBox = document.getElementById('countdownBox');
+          const countdownText = document.getElementById('countdownText');
+          if (countdownBox && countdownText) {
+            gameOverScreen.classList.add('hidden');
+            countdownBox.classList.remove('hidden');
+            
+            if (this.scene.successSound) {        
+              this.scene.successSound.play();
+            }
+
+            let count = 3;
+            countdownText.textContent = count;
+            const countdownInterval = setInterval(() => {
+              count--;
+              if (count > 0) {
+                countdownText.textContent = count;
+              } else {
+                clearInterval(countdownInterval);
+                countdownBox.classList.add('hidden');
+                // 게임 이어서 진행
+                isGameOver = false;
+                gameState = 'playing';
+                this.scene.physics.resume();
+                if (typeof player !== 'undefined' && player) {
+                  player.setVisible(true);
+                  player.clearTint();
+                }
+                if (typeof scoreText !== 'undefined' && scoreText) scoreText.setVisible(true);
+                if (typeof distanceText !== 'undefined' && distanceText) distanceText.setVisible(true);
+                  // 화면에 있는 모든 적 제거
+                  if (typeof enemies !== 'undefined' && enemies) {
+                    enemies.children.iterate((enemy) => {
+                      if (enemy && enemy.active) {
+                        if (typeof this.removeEnemyHealthBar === 'function') this.removeEnemyHealthBar(enemy);
+                        enemy.destroy();
+                      }
+                    });
+                  }
+                  if (typeof kingEnemies !== 'undefined' && kingEnemies) {
+                    kingEnemies.children.iterate((enemy) => {
+                      if (enemy && enemy.active) {
+                        if (typeof this.removeEnemyHealthBar === 'function') this.removeEnemyHealthBar(enemy);
+                        enemy.destroy();
+                      }
+                    });
+                  }
+                  if (typeof kingKingEnemies !== 'undefined' && kingKingEnemies) {
+                    kingKingEnemies.children.iterate((enemy) => {
+                      if (enemy && enemy.active) {
+                        if (typeof this.removeEnemyHealthBar === 'function') this.removeEnemyHealthBar(enemy);
+                        enemy.destroy();
+                      }
+                    });
+                  }
+                  // 1초 후 적 스폰 재개
+                  setTimeout(() => {
+                    if (this.scene.spawnSystem && typeof this.scene.spawnSystem.resumeSpawning === 'function') {
+                      this.scene.spawnSystem.resumeSpawning();
+                    }
+                    if (this.scene.bgm && typeof this.scene.bgm.play === 'function') {
+                      this.scene.bgm.play();
+                    }
+                  }, 300);
+              }
+            }, 1000);
+          }
+        } else { // 오답인 경우
+          if (this.scene.failSound) {
+            this.scene.failSound.play();
+          }
+          gameOverScreen.classList.add('hidden');
+          wrongAnswerScreen.classList.remove('hidden');
+          wrongAnswerInfo.innerHTML = `Final Score: <b>${score}</b><br>Distance: <b>${Math.floor(distance / 10)}m</b>`;
+        }
+
+        quizScreen.classList.add('hidden');
       };
     }
     // 게임 오버 효과음 재생
@@ -228,10 +521,16 @@ class CollisionSystem {
   destroyEnemy(enemy, coinCount, scoreValue) {
     // 체력바 제거
     this.removeEnemyHealthBar(enemy);
-    
+
     // 동전 드랍
     this.dropCoins(enemy.x, enemy.y, coinCount);
-    
+
+    // 킹 enemy 또는 킹킹 enemy일 때 포션 드랍 + 키 드랍 (한 번만)
+    if (enemy.texture && (enemy.texture.key === 'king_enemy' || enemy.texture.key === 'king_king_enemy')) {
+      this.dropPotion(enemy.x, enemy.y);
+      this.dropKey(enemy.x, enemy.y);
+    }
+
     this.updateScore(scoreValue);
     enemy.destroy();
     // 효과음 재생

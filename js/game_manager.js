@@ -65,8 +65,13 @@ class GameManager {
     if (gameOverText) {
       gameOverText.setVisible(false);
     }
+
     if (restartButton) {
       restartButton.setVisible(false);
+    }
+
+    if (retryButton) {
+      retryButton.setVisible(false);
     }
 
     // 모든 타이머와 이벤트 정리
@@ -163,7 +168,12 @@ class GameManager {
     if (isGameOver || gameState !== 'playing') return;
 
     // 배경 스크롤
-    background.tilePositionY -= 2;
+    // 피버타임이면 배경 스크롤 속도 증가
+    if (typeof isFeverTime !== 'undefined' && isFeverTime) {
+      background.tilePositionY -= 10;
+    } else {
+      background.tilePositionY -= 3;
+    }
 
     // 주행거리 업데이트
     distance += 2;

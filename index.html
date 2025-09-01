@@ -1,20 +1,21 @@
 <!DOCTYPE html>
 <html lang="ko">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="mobile-web-app-capable" content="yes">
-  <title>외계인 플라이트</title>
+  <title>아이스의 모험</title>
   <link rel="stylesheet" href="style.css">
   <script src="https://cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser.js"></script>
 </head>
-<body>
 
+<body>
   <!-- 시작 화면 -->
   <div id="startScreen">
-    <h1 id="gameTitle">MINI FLIGHT</h1>
+    <h1 id="gameTitle">아이스의 모험</h1>
     <button id="startButton">START</button>
     <div id="controls">
       PC: 키보드로 이동<br>
@@ -24,16 +25,55 @@
 
   <!-- 게임 오버 화면 -->
   <div id="gameOverScreen" class="hidden">
-    <h2 id="gameOverTitle">GAME OVER</h2>
+    <h2 id="gameOverTitle">적과의 충돌!</h2>
     <div id="gameOverInfo"></div>
-    <button id="restartButton">다시하기</button>
+    <div class="buttonBox">
+      <button class="retryButton">이어서 하기</button>
+      <button class="restartButton">다시 하기</button>
+    </div>
   </div>
 
-<script src="js/config.js"></script>
-<script src="js/spawn_system.js"></script>
-<script src="js/collision_system.js"></script>
-<script src="js/input_system.js"></script>
-<script src="js/game_manager.js"></script>
-<script src="js/main.js"></script>
+  <!-- 카운트다운 박스: 반드시 body 바로 아래에 위치 -->
+  <div id="countdownBox" class="hidden">
+    <h2 id="countdownText" style="font-size:4rem; color:#fff; margin-top:30px;">3</h2>
+  </div>
+
+  <!-- 문제 풀이 화면 -->
+  <div id="quizScreen" class="hidden">
+    <h2 id="quizTitle">문제 풀이</h2>
+    <div id="quizInfo">
+      <div class="question">2+3=</div>
+      <div class="userAnswer">
+        <input type="text" data-answer="5" />
+      </div>
+      <button id="submitButton">제출</button>
+    </div>
+  </div>
+
+  <!-- 오답 화면 -->
+  <div id="wrongAnswerScreen" class="hidden">
+    <h2 id="wrongAnswerTitle">오답입니다!</h2>
+    <div id="wrongAnswerInfo"></div>
+    <div class="buttonBox">
+      <button class="retryButton">다시 시도</button>
+      <button class="restartButton">처음으로</button>
+    </div>
+  </div>
+
+  <!-- 키 부족 화면 -->
+  <div id="finalOverScreen" class="hidden">
+    <h2 id="finalOverTitle">키가 부족합니다!</h2>
+    <div class="buttonBox">
+      <button class="restartButton">처음으로</button>
+    </div>
+  </div>
+
+  <script src="js/config.js"></script>
+  <script src="js/spawn_system.js"></script>
+  <script src="js/collision_system.js"></script>
+  <script src="js/input_system.js"></script>
+  <script src="js/game_manager.js"></script>
+  <script src="js/main.js"></script>
 </body>
+
 </html>

@@ -39,13 +39,18 @@ let kingKingEnemies;
 let enemyBullets;
 let coins;
 let powerups;
+let potions;
 let background;
 let cursors;
 let warningOverlay;
 let gameOverText;
 let restartButton;
+let retryButton;
 
 // 게임 상태 변수들
+let keys;
+let isFeverTime = false;
+// let feverTimeEnd = 0; // 피버타임 종료 시각 (사용하지 않음)
 let score = 0;
 let distance = 0;
 let lastKingSpawn = 0;
@@ -53,6 +58,7 @@ let lastKingKingSpawn = 0;
 let lastFired = 0;
 let isGameOver = false;
 let gameState = 'start';
+let isPlayerInvincible = false;
 
 // 파워업 관련 변수들
 let isDoubleBullet = false;
@@ -118,5 +124,6 @@ const GAME_COLORS = {
   HIT_EFFECT: 0xffffff,
   POWERUP_EFFECT: 0xffffff,
   PLAYER_POWERUP: 0x00ff00,
+  PLAYER_INVINCIBLE: 0x0000ff,
   GAME_OVER: 0xff0000
 };
