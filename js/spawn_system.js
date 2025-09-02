@@ -81,35 +81,51 @@ class SpawnSystem {
   }
 
   // 공통: 체력바 생성
-  createHealthBar(
-    x,
-    y,
-    width,
-    height,
-    bgAlpha = 0.7,
-    fillColor = GAME_COLORS.GREEN
-  ) {
-    const healthBarBg = this.scene.add.rectangle(
-      x,
-      y,
-      width,
-      height,
-      GAME_COLORS.BLACK,
-      bgAlpha
-    );
-    const healthBarFill = this.scene.add.rectangle(
-      x,
-      y,
-      width,
-      height - 2,
-      fillColor
-    );
+  createHealthBar( x, y, width, height, bgAlpha = 0.7, fillColor = GAME_COLORS.GREEN) {
+    const healthBarBg = this.scene.add.rectangle( x, y, width, height, GAME_COLORS.BLACK, bgAlpha );
+    const healthBarFill = this.scene.add.rectangle( x, y, width, height - 2, fillColor );
     return { healthBarBg, healthBarFill };
   }
 
   // 공통: 에너미 기본 설정
   setupEnemy(enemy, x, y, scale, velocityY, tint, health) {
-    enemy.setScale(scale);
+    // 적 애니메이션 적용 (spritesheet 사용 시)
+    if (enemy.anims && enemy.texture && enemy.texture.key === 'enemy') {
+      if (!enemy.scene.anims.exists('enemyFly')) {
+        enemy.scene.anims.create({
+          key: 'enemyFly',
+          frames: enemy.scene.anims.generateFrameNumbers('enemy', { start: 0, end: 1 }),
+          frameRate: 5,
+          repeat: -1
+        });
+      }
+      enemy.anims.play('enemyFly', true);
+    }
+    if (enemy.anims && enemy.texture && enemy.texture.key === 'king_enemy') {
+      if (!enemy.scene.anims.exists('king_enemyFly')) {
+        enemy.scene.anims.create({
+          key: 'king_enemyFly',
+          frames: enemy.scene.anims.generateFrameNumbers('king_enemy', { start: 0, end: 5 }),
+          frameRate: 5,
+          repeat: -1
+        });
+      }
+      enemy.anims.play('king_enemyFly', true);
+    }
+
+    if (enemy.anims && enemy.texture && enemy.texture.key === 'king_king_enemy') {
+      if (!enemy.scene.anims.exists('king_king_enemyFly')) {
+        enemy.scene.anims.create({
+          key: 'king_king_enemyFly',
+          frames: enemy.scene.anims.generateFrameNumbers('king_king_enemy', { start: 0, end: 5 }),
+          frameRate: 5,
+          repeat: -1
+        });
+      }
+      enemy.anims.play('king_king_enemyFly', true);
+    }
+
+    // enemy.setScale(scale);
     enemy.setVelocityY(velocityY);
     if (tint) enemy.setTint(tint);
 
@@ -120,15 +136,7 @@ class SpawnSystem {
   }
 
   // 공통: 총알 생성
-  createBullet(
-    x,
-    y,
-    scale,
-    tint,
-    velocityX = 0,
-    velocityY = 0,
-    angularVelocity = 0
-  ) {
+  createBullet( x, y, scale, tint, velocityX = 0, velocityY = 0, angularVelocity = 0 ) {
     const bullet = enemyBullets.create(x, y, 'enemyBullet');
     bullet.setScale(scale);
     if (tint) bullet.setTint(tint);
@@ -212,25 +220,10 @@ class SpawnSystem {
       const x = this.findNonOverlappingPosition(spawnedPositions, 80);
       spawnedPositions.push(x); // 새 위치를 배열에 추가
 
-      const enemy = enemies.create(x, -50, 'enemy');
-      this.setupEnemy(
-        enemy,
-        x,
-        -50,
-        0.5,
-        150,
-        null,
-        GAME_CONSTANTS.ENEMY_HEALTH
-      );
-
+    const enemy = enemies.create(x, -50, 'enemy');
+      this.setupEnemy( enemy, x, -50, 0.9, 150, null, GAME_CONSTANTS.ENEMY_HEALTH );
       // 체력바 생성
-      const { healthBarBg, healthBarFill } = this.createHealthBar(
-        x,
-        -70,
-        60,
-        6,
-        0.6
-      );
+      const { healthBarBg, healthBarFill } = this.createHealthBar( x, -70, 60, 6, 0.6 );
       enemy.healthBarBg = healthBarBg;
       enemy.healthBarFill = healthBarFill;
     }
@@ -251,15 +244,7 @@ class SpawnSystem {
       if (!this.isActive) return; // 중간에 정지될 수 있으므로 다시 체크
 
       const x = Phaser.Math.Between(20, 460);
-      const enemyBullet = this.createBullet(
-        x,
-        0,
-        3,
-        null,
-        Phaser.Math.Between(-30, 30),
-        400,
-        720
-      );
+      const enemyBullet = this.createBullet( x, 0, 3, null, Phaser.Math.Between(-30, 30), 400, 720 );
 
       // 크기 펄스 효과
       this.scene.tweens.add({
@@ -287,23 +272,9 @@ class SpawnSystem {
 
     this.createWarningEffect(0.6, 200, 4, () => {
       const kingEnemy = kingEnemies.create(240, -50, 'king_enemy');
-      this.setupEnemy(
-        kingEnemy,
-        240,
-        -50,
-        0.7, // 크기 감소
-        100,
-        GAME_COLORS.ORANGE,
-        GAME_CONSTANTS.KING_ENEMY_HEALTH
-      );
-
+      this.setupEnemy( kingEnemy, 240, -50, 5, 100, GAME_COLORS.ORANGE, GAME_CONSTANTS.KING_ENEMY_HEALTH);
       // 체력바 생성
-      const { healthBarBg, healthBarFill } = this.createHealthBar(
-        240,
-        -20,
-        100,
-        8
-      );
+      const { healthBarBg, healthBarFill } = this.createHealthBar( 240, -20, 100, 8 );
       kingEnemy.healthBarBg = healthBarBg;
       kingEnemy.healthBarFill = healthBarFill;
 
@@ -322,23 +293,10 @@ class SpawnSystem {
     if (!kingEnemy || !kingEnemy.active || isGameOver) return;
 
     // 플레이어 방향으로 총알 발사
-    const angle = Phaser.Math.Angle.Between(
-      kingEnemy.x,
-      kingEnemy.y,
-      player.x,
-      player.y
-    );
+    const angle = Phaser.Math.Angle.Between( kingEnemy.x, kingEnemy.y, player.x, player.y );
     const speed = GAME_CONSTANTS.KING_BULLET_SPEED;
-
-    const kingBullet = this.createBullet(
-      kingEnemy.x,
-      kingEnemy.y + 25,
-      1.5,
-      GAME_COLORS.ORANGE,
-      Math.cos(angle) * speed,
-      Math.sin(angle) * speed,
-      270
-    );
+    // const kingBullet = this.createBullet( kingEnemy.x, kingEnemy.y + 25, 1.5, GAME_COLORS.ORANGE, Math.cos(angle) * speed, Math.sin(angle) * speed, 270
+    // );
 
     // 다음 발사 예약 (킹 에너미가 살아있는 동안 계속 발사)
     this.scene.time.delayedCall(kingEnemy.fireRate, () => {
@@ -423,8 +381,6 @@ class SpawnSystem {
       });
     });
   }
-
-
 
   // 킹킹 에너미 총알 발사 시스템
   startKingKingEnemyFiring(kingKingEnemy) {

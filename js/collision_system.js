@@ -134,7 +134,7 @@ class CollisionSystem {
         healthBarWidth: 60,
         tintColor: GAME_COLORS.NORMAL_ENEMY,
         baseScale: 0.4,
-        scaleMultiplier: 0.05, // 더 크게 줄어듦
+        scaleMultiplier: 0.5, // 더 크게 줄어듦
         coinDrop: 1,
         destroyScore: 5,
         hitScore: 2

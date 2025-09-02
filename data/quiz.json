@@ -1,22 +1,12 @@
 [
-  {
-    "question": "3 + 8 = ?",
-    "answer": "11"
-  },
-  {
-    "question": "15 - 7 = ?",
-    "answer": "8"
-  },
-  {
-    "question": "4 x 6 = ?",
-    "answer": "24"
-  },
-  {
-    "question": "18 ÷ 3 = ?",
-    "answer": "6"
-  },
-  {
-    "question": "10 + 9 = ?",
-    "answer": "19"
-  }
+  { "question": "대한민국의 수도는?", "answer": "서울" },
+  { "question": "일본의 수도는?", "answer": "도쿄" },
+  { "question": "프랑스의 수도는?", "answer": "파리" },
+  { "question": "미국의 수도는?", "answer": "워싱턴" },
+  { "question": "중국의 수도는?", "answer": "베이징" },
+  { "question": "러시아의 수도는?", "answer": "모스크바" },
+  { "question": "영국의 수도는?", "answer": "런던" },
+  { "question": "독일의 수도는?", "answer": "베를린" },
+  { "question": "이탈리아의 수도는?", "answer": "로마" },
+  { "question": "캐나다의 수도는?", "answer": "오타와" }
 ]

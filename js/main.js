@@ -14,15 +14,22 @@ function preload() {
   this.load.image('bg_fever', 'assets/bg_fever.png');
   // this.load.image('bg', 'assets/background.png');
   // this.load.image('player', 'assets/player.png');
-  this.load.image('player', 'assets/player1.png');
+  // this.load.image('player', 'assets/player1.png');
+  // 캐릭터 이미지 로드
+  // this.load.image('player', 'assets/player2.png');
+  this.load.spritesheet('player', 'assets/player2.png', { frameWidth: 100, frameHeight: 100 });
   this.load.image('bullet', 'https://labs.phaser.io/assets/sprites/bullet.png');
   this.load.image('enemyBullet', 'https://labs.phaser.io/assets/sprites/enemy-bullet.png');
   // this.load.image('enemy', 'assets/enemy.png');
   // this.load.image('king_enemy', 'assets/king_enemy.png');
   // this.load.image('king_king_enemy', 'assets/king_king_enemy.png');
-  this.load.image('enemy', 'assets/enemy1.png');
-  this.load.image('king_enemy', 'assets/enemy2.png');
-  this.load.image('king_king_enemy', 'assets/enemy3.png');
+  // this.load.image('enemy', 'assets/enemy1.png');
+  this.load.spritesheet('enemy', 'assets/enemy11.png', { frameWidth: 100, frameHeight: 100 });
+  // this.load.image('king_enemy', 'assets/enemy2.png');
+  this.load.spritesheet('king_enemy', 'assets/enemy22.png',  { frameWidth: 158, frameHeight: 200 });
+  // this.load.image('king_king_enemy', 'assets/enemy3.png');
+  this.load.spritesheet('king_king_enemy', 'assets/enemy33.png', { frameWidth: 158, frameHeight: 200 });
+  
   // this.load.image('coin', 'assets/coin.png');
   this.load.image('coin', 'assets/coin2.png');
   // this.load.image('powerup', 'assets/powerup.png');
@@ -76,8 +83,38 @@ function create() {
   background.isFever = false;
 
   // 플레이어
-  // player = this.physics.add.sprite(240, 700, 'player').setScale(0.6);
-  player = this.physics.add.image(200, 1000, 'player').setScale(0.2)
+  player = this.physics.add.sprite(240, 200, 'player', 0);
+  // player = this.physics.add.image(200, 1000, 'player').setScale(0.2)
+
+  this.anims.create({
+    key: 'fly',
+    frames: this.anims.generateFrameNumbers('player', { start: 0, end: 1 }),
+    frameRate: 5,
+    repeat: -1
+  });
+
+  this.anims.create({
+    key: 'enemyFly',
+    frames: this.anims.generateFrameNumbers('enemy', { start: 0, end: 1 }),
+    frameRate: 5,
+    repeat: -1
+  });
+
+  this.anims.create({
+    key: 'king_enemyFly',
+    frames: this.anims.generateFrameNumbers('king_enemy', { start: 0, end: 5 }),
+    frameRate: 5,
+    repeat: -1
+  });
+
+  this.anims.create({
+    key: 'king_king_enemyFly',
+    frames: this.anims.generateFrameNumbers('king_king_enemy', { start: 0, end: 5 }),
+    frameRate: 5,
+    repeat: -1
+  });
+
+  player.anims.play('fly', true);
   player.setCollideWorldBounds(true);
   player.setVisible(false); // 시작 화면에서는 숨김
 
@@ -96,11 +133,7 @@ function create() {
   keyInventoryCount = 3;
   keyInventoryIcon = this.add.image(40, 780, 'key').setScale(0.5).setDepth(10);
   keyInventoryText = this.add.text(65, 770, keyInventoryCount, {
-    fontSize: '22px',
-    fill: '#ffe066',
-    fontFamily: 'PFStardustS, Arial, sans-serif',
-    stroke: '#333',
-    strokeThickness: 3
+    fontSize: '22px', fill: '#ffe066', fontFamily: 'PFStardustS, Arial, sans-serif', stroke: '#333', strokeThickness: 3
   }).setDepth(10);
 
   // UI 텍스트 생성

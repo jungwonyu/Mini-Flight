@@ -60,7 +60,8 @@ body {
   user-select: none;
   font-family: 'PFStardustS', Arial, sans-serif;
   /* background-image: url('assets/bg.gif'); */
-  background-image: url('assets/bg22.png');
+  background-image: url('assets/background.jpg');
+  background-size: cover;
   background-color: rgba(0, 0, 0, 0.3);
   background-blend-mode: darken;
 }
