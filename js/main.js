@@ -84,6 +84,7 @@ function create() {
 
   // 플레이어
   player = this.physics.add.sprite(240, 200, 'player', 0);
+  player.setCircle(30, 20, 20);
 
   this.anims.create({
     key: 'fly',
@@ -120,6 +121,10 @@ function create() {
   // 게임 오브젝트 그룹 생성
   bullets = this.physics.add.group();
   enemies = this.physics.add.group();
+  // 적 히트박스(충돌 영역) 축소
+  enemies.children.iterate((enemy) => {
+    if (enemy) enemy.setCircle(30, 20, 20);
+  });
   kingEnemies = this.physics.add.group();
   kingKingEnemies = this.physics.add.group();
   enemyBullets = this.physics.add.group();

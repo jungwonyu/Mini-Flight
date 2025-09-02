@@ -187,7 +187,6 @@ class CollisionSystem {
       if (enemy.texture && enemy.texture.key === 'king_enemy') {
         // king_enemy는 displaySize로 크기 조정
         const baseW = 123, baseH = 100;
-        // const scale = 1.1 * (0.5 + healthRatio * 0.5); // 최소 1.5배 ~ 최대 3배
         const scale = 1.1 + healthRatio;
         enemy.setDisplaySize(baseW * scale, baseH * scale);
       } else if (enemy.texture && enemy.texture.key === 'king_king_enemy') {

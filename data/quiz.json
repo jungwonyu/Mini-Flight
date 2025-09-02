@@ -8,5 +8,9 @@
   { "question": "영국의 수도는?", "answer": "런던" },
   { "question": "독일의 수도는?", "answer": "베를린" },
   { "question": "이탈리아의 수도는?", "answer": "로마" },
-  { "question": "캐나다의 수도는?", "answer": "오타와" }
+  { "question": "캐나다의 수도는?", "answer": "오타와" },
+  { "question": "스위스의 수도는?", "answer": "베른" },
+  { "question": "호주의 수도는?", "answer": "캔버라" },
+  { "question": "브라질의 수도는?", "answer": "브라질리아" },
+  { "question": "터키의 수도는?", "answer": "앙카라" }
 ]
