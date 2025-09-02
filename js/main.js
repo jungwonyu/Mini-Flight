@@ -26,9 +26,9 @@ function preload() {
   // this.load.image('enemy', 'assets/enemy1.png');
   this.load.spritesheet('enemy', 'assets/enemy11.png', { frameWidth: 100, frameHeight: 100 });
   // this.load.image('king_enemy', 'assets/enemy2.png');
-  this.load.spritesheet('king_enemy', 'assets/enemy22.png',  { frameWidth: 158, frameHeight: 200 });
+  this.load.spritesheet('king_enemy', 'assets/enemy22.png',  { frameWidth: 125, frameHeight: 100 });
   // this.load.image('king_king_enemy', 'assets/enemy3.png');
-  this.load.spritesheet('king_king_enemy', 'assets/enemy33.png', { frameWidth: 158, frameHeight: 200 });
+  this.load.spritesheet('king_king_enemy', 'assets/enemy33.png', { frameWidth: 156, frameHeight: 200 });
   
   // this.load.image('coin', 'assets/coin.png');
   this.load.image('coin', 'assets/coin2.png');
@@ -84,7 +84,6 @@ function create() {
 
   // 플레이어
   player = this.physics.add.sprite(240, 200, 'player', 0);
-  // player = this.physics.add.image(200, 1000, 'player').setScale(0.2)
 
   this.anims.create({
     key: 'fly',
@@ -102,7 +101,7 @@ function create() {
 
   this.anims.create({
     key: 'king_enemyFly',
-    frames: this.anims.generateFrameNumbers('king_enemy', { start: 0, end: 5 }),
+    frames: this.anims.generateFrameNumbers('king_enemy', { start: 0, end: 4 }),
     frameRate: 5,
     repeat: -1
   });
@@ -115,6 +114,7 @@ function create() {
   });
 
   player.anims.play('fly', true);
+  player.setDisplaySize(100 * 2, 100 * 2); // 플레이어 크기 2배
   player.setCollideWorldBounds(true);
   player.setVisible(false); // 시작 화면에서는 숨김
 

@@ -100,17 +100,19 @@ class SpawnSystem {
         });
       }
       enemy.anims.play('enemyFly', true);
+      enemy.setDisplaySize(100 * 1.2, 100 * 1.2); // 일반 적 크기 1.2배
     }
     if (enemy.anims && enemy.texture && enemy.texture.key === 'king_enemy') {
       if (!enemy.scene.anims.exists('king_enemyFly')) {
         enemy.scene.anims.create({
           key: 'king_enemyFly',
-          frames: enemy.scene.anims.generateFrameNumbers('king_enemy', { start: 0, end: 5 }),
-          frameRate: 5,
+          frames: enemy.scene.anims.generateFrameNumbers('king_enemy', { start: 0, end: 4 }),
+          frameRate: 4,
           repeat: -1
         });
       }
       enemy.anims.play('king_enemyFly', true);
+      enemy.setDisplaySize(125 * 1.7, 100 * 1.7); // 킹에너미 크기 1.7배
     }
 
     if (enemy.anims && enemy.texture && enemy.texture.key === 'king_king_enemy') {
@@ -123,6 +125,7 @@ class SpawnSystem {
         });
       }
       enemy.anims.play('king_king_enemyFly', true);
+      enemy.setDisplaySize(156 * 1.1, 200 * 1.1); // 킹킹에너미 크기 1.5배
     }
 
     // enemy.setScale(scale);

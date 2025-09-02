@@ -133,7 +133,7 @@ class CollisionSystem {
       'normal': {
         healthBarWidth: 60,
         tintColor: GAME_COLORS.NORMAL_ENEMY,
-        baseScale: 0.4,
+        baseScale: 1,
         scaleMultiplier: 0.5, // 더 크게 줄어듦
         coinDrop: 1,
         destroyScore: 5,
@@ -143,7 +143,7 @@ class CollisionSystem {
         healthBarWidth: 100,
         tintColor: GAME_COLORS.KING_ENEMY,
         baseScale: 0.8,
-        scaleMultiplier: 0.2, // 더 크게 줄어듦
+        scaleMultiplier: 0.3, // 더 크게 줄어듦
         coinDrop: 5,
         destroyScore: 100,
         hitScore: 5
@@ -152,7 +152,7 @@ class CollisionSystem {
         healthBarWidth: 150,
         tintColor: GAME_COLORS.KING_KING_ENEMY,
         baseScale: 1.2,
-        scaleMultiplier: 0.2,
+        scaleMultiplier: 0.3,
         coinDrop: 10,
         destroyScore: 300,
         hitScore: 8
@@ -184,7 +184,21 @@ class CollisionSystem {
     
     // 체력에 따라 크기 조정
     const healthRatio = enemy.health / enemy.maxHealth;
-    enemy.setScale(config.baseScale + (healthRatio * config.scaleMultiplier)); 
+      if (enemy.texture && enemy.texture.key === 'king_enemy') {
+        // king_enemy는 displaySize로 크기 조정
+        const baseW = 123, baseH = 100;
+        // const scale = 1.1 * (0.5 + healthRatio * 0.5); // 최소 1.5배 ~ 최대 3배
+        const scale = 1.1 + healthRatio;
+        enemy.setDisplaySize(baseW * scale, baseH * scale);
+      } else if (enemy.texture && enemy.texture.key === 'king_king_enemy') {
+        // king_king_enemy도 displaySize로 크기 조정
+        const baseW = 156, baseH = 200;
+        const scale = 1.0 + healthRatio; // 최소 1배 ~ 최대 2배
+        enemy.setDisplaySize(baseW * scale, baseH * scale);
+      } else {
+        // 일반 적은 기존 방식 유지
+        enemy.setScale(config.baseScale + (healthRatio * config.scaleMultiplier));
+      }
     
     if (enemy.health <= 0) {
       this.destroyEnemy(enemy, config.coinDrop, config.destroyScore);

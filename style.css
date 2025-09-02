@@ -76,7 +76,6 @@ canvas {
   max-width: 100vw;
   max-height: 100vh;
   object-fit: contain;
-  border: 2px solid #b2405e;
 }
 
 #startScreen {
