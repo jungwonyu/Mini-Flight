@@ -17,7 +17,7 @@ function preload() {
   // this.load.image('player', 'assets/player1.png');
   // 캐릭터 이미지 로드
   // this.load.image('player', 'assets/player2.png');
-  this.load.spritesheet('player', 'assets/player2.png', { frameWidth: 100, frameHeight: 100 });
+  this.load.spritesheet('player', 'assets/player2.png', { frameWidth: 150, frameHeight: 150 });
   this.load.image('bullet', 'https://labs.phaser.io/assets/sprites/bullet.png');
   this.load.image('enemyBullet', 'https://labs.phaser.io/assets/sprites/enemy-bullet.png');
   // this.load.image('enemy', 'assets/enemy.png');
@@ -26,7 +26,7 @@ function preload() {
   // this.load.image('enemy', 'assets/enemy1.png');
   this.load.spritesheet('enemy', 'assets/enemy11.png', { frameWidth: 100, frameHeight: 100 });
   // this.load.image('king_enemy', 'assets/enemy2.png');
-  this.load.spritesheet('king_enemy', 'assets/enemy22.png',  { frameWidth: 125, frameHeight: 100 });
+  this.load.spritesheet('king_enemy', 'assets/enemy22.png',  { frameWidth: 123, frameHeight: 100 });
   // this.load.image('king_king_enemy', 'assets/enemy3.png');
   this.load.spritesheet('king_king_enemy', 'assets/enemy33.png', { frameWidth: 156, frameHeight: 200 });
   
@@ -114,7 +114,6 @@ function create() {
   });
 
   player.anims.play('fly', true);
-  player.setDisplaySize(100 * 2, 100 * 2); // 플레이어 크기 2배
   player.setCollideWorldBounds(true);
   player.setVisible(false); // 시작 화면에서는 숨김
 
