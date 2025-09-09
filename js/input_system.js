@@ -1,5 +1,3 @@
-// 플레이어 입력 및 컨트롤 시스템
-
 class InputSystem {
   constructor(scene) {
     this.scene = scene;
@@ -70,7 +68,10 @@ class InputSystem {
 
     // 더블 총알 타이머 확인
     if (isDoubleBullet && time > doubleBulletEndTime) {
-      isDoubleBullet = false;
+            isDoubleBullet = false;
+            if (player && player.active) {
+              player.setTexture('player');
+            }
     }
 
     // 자동 발사

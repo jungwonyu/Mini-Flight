@@ -1,10 +1,9 @@
-// 게임 설정 및 전역 변수들
-
 // Phaser 게임 설정
 const config = {
   type: Phaser.AUTO,
   width: 480,
   height: 800,
+  parent: 'gameScreen',
   scale: {
     mode: Phaser.Scale.FIT,
     autoCenter: Phaser.Scale.CENTER_BOTH,
@@ -20,7 +19,7 @@ const config = {
   physics: {
     default: 'arcade',
     arcade: {
-      debug: false
+      debug: true
     }
   },
   scene: {
@@ -50,9 +49,9 @@ let retryButton;
 // 게임 상태 변수들
 let keys;
 let isFeverTime = false;
-// let feverTimeEnd = 0; // 피버타임 종료 시각 (사용하지 않음)
 let score = 0;
 let distance = 0;
+let gameOverCount = 0;
 let lastKingSpawn = 0;
 let lastKingKingSpawn = 0;
 let lastFired = 0;
@@ -78,13 +77,13 @@ const GAME_CONSTANTS = {
   PLAYER_MOVE_SPEED: 5,
   TOUCH_MOVE_SPEED: 8,
   BULLET_SPEED: -300,
-  BULLET_SCALE: 1.5,
+  BULLET_SCALE: 0.2,
   FIRE_RATE: 250,
   KING_SPAWN_DISTANCE: 200,
   KING_KING_SPAWN_DISTANCE: 500,
+  
+  // 파워업
   POWERUP_DURATION: 5000,
-
-  // 파워업 스폰 설정
   POWERUP_MIN_SPAWN_TIME: 8000,   // 최소 8초
   POWERUP_MAX_SPAWN_TIME: 15000,  // 최대 15초
   POWERUP_FIRST_SPAWN_DELAY: 5000, // 첫 파워업 5초 후
@@ -95,10 +94,10 @@ const GAME_CONSTANTS = {
   KING_KING_ENEMY_HEALTH: 20,
   
   // 보스 총알 발사 설정
-  KING_FIRE_RATE: 2000,        // 킹 에너미 2초마다 발사
-  KING_KING_FIRE_RATE: 2500,   // 킹킹 에너미 2.5초마다 발사
-  KING_BULLET_SPEED: 200,      // 킹 에너미 총알 속도
-  KING_KING_BULLET_SPEED: 200  // 킹킹 에너미 총알 속도
+  KING_FIRE_RATE: 2000,    
+  KING_KING_FIRE_RATE: 2500,   
+  KING_BULLET_SPEED: 200,     
+  KING_KING_BULLET_SPEED: 200 
 };
 
 // 게임 색상 상수들

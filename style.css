@@ -1,3 +1,57 @@
+@font-face {
+  font-family: 'PFStardustS';
+  src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/2506-1@1.0/PFStardustS.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+}
+
+body {
+  margin: 0;
+  overflow: hidden;
+  touch-action: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  font-family: 'PFStardustS', Arial, sans-serif;
+  background-size: contain;
+  background-color: rgba(137, 231, 255, 0.3);
+  background-blend-mode: darken;
+}
+
+p {
+  margin: 0;
+  padding: 0;
+}
+
+canvas {
+  margin: 0 auto;
+  max-width: 100vw;
+  max-height: 100vh;
+  object-fit: contain;
+}
+
+button {
+  border: none;
+  width: calc(600px / 3);
+  height: calc(300px / 3);
+  font-family: 'PFStardustS', Arial, sans-serif;
+  font-weight: bold;
+  font-size: 1.8rem;
+  color: #fff;
+  padding-bottom: 10px;
+  background: url('assets/images/button.png') no-repeat center / cover;
+  cursor: pointer;
+}
+
+/* button:hover {
+  transform: translateY(-2px);
+} */
+
+.hidden {
+  display: none !important;
+}
+
 #countdownBox {
   position: fixed;
   top: 0;
@@ -23,13 +77,6 @@
   font-weight: bold;
 }
 
-@font-face {
-  font-family: 'PFStardustS';
-  src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/2506-1@1.0/PFStardustS.woff2') format('woff2');
-  font-weight: 400;
-  font-style: normal;
-}
-
 #startTitle {
   font-size: 2.5rem;
   margin-bottom: 1rem;
@@ -38,44 +85,6 @@
 #startInfo {
   font-size: 1.2rem;
   margin-bottom: 2rem;
-}
-
-#startButton {
-  background: #4CAF50;
-  color: #fff;
-  padding: 15px 40px;
-  font-size: 1.5rem;
-  border-radius: 25px;
-  cursor: pointer;
-  box-shadow: 0 4px 15px rgba(76, 175, 80, 0.4);
-}
-
-body {
-  margin: 0;
-  overflow: hidden;
-  touch-action: none;
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  user-select: none;
-  font-family: 'PFStardustS', Arial, sans-serif;
-  /* background-image: url('assets/bg.gif'); */
-  background-image: url('assets/background.jpg');
-  background-size: cover;
-  background-color: rgba(0, 0, 0, 0.3);
-  background-blend-mode: darken;
-}
-
-button {
-  font-family: 'PFStardustS', Arial, sans-serif;
-}
-
-canvas {
-  display: block;
-  margin: 0 auto;
-  max-width: 100vw;
-  max-height: 100vh;
-  object-fit: contain;
 }
 
 #startScreen {
@@ -88,46 +97,25 @@ canvas {
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  gap: 20px;
   z-index: 1000;
-  color: white;
-  text-align: center;
+  background-color: rgba(137, 231, 255, 0.3);
+}
+
+#gameScreen {
+  width: 100%;
+  height: 100%;
 }
 
 #gameTitle {
-  font-size: 4rem;
+  font-size: 6rem;
   font-weight: bold;
-  margin-bottom: 1rem;
-  /* background: linear-gradient(80deg, #fff, #add8e6); */
+  position: absolute;
+  top: 200px;
   background: #000;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-}
-
-#startButton {
-  background: linear-gradient(80deg, #fff, #add8e6);
-  border: none;
-  color: #000;
-  padding: 15px 40px;
-  font-size: 1.5rem;
-  border-radius: 25px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  margin-bottom: 2rem;
-}
-
-#startButton:hover {
-  transform: translateY(-2px);
-}
-
-#controls {
-  font-size: 1.8rem;
-  color: #aaaaaa;
-  line-height: 1.5;
-}
-
-.hidden {
-  display: none !important;
 }
 
 @media (max-width: 480px) {
@@ -151,10 +139,10 @@ canvas {
   }
 }
 
-#quizScreen,
 #gameOverScreen,
 #wrongAnswerScreen,
-#finalOverScreen {
+#finalOverScreen,
+#quizScreen {
   position: fixed;
   top: 0;
   left: 0;
@@ -162,11 +150,90 @@ canvas {
   height: 100vh;
   z-index: 2000;
   display: flex;
-  flex-direction: column;
   justify-content: center;
   align-items: center;
+  flex-direction: column;
+  gap: 20px;
   background: rgba(0, 0, 0, 0.7);
   color: #fff;
+}
+
+#quizCard {
+  width: 350px;
+  min-height: 340px;
+  background: linear-gradient(120deg, #fff 80%, #add8e6 100%);
+  border-radius: 30px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25), 0 1.5px 0 #add8e6;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 32px 24px 24px 24px;
+  animation: quizCardPop 0.5s cubic-bezier(.68, -0.55, .27, 1.55);
+}
+
+@keyframes quizCardPop {
+  0% {
+    transform: scale(0.7);
+    opacity: 0;
+  }
+
+  80% {
+    transform: scale(1.05);
+    opacity: 1;
+  }
+
+  100% {
+    transform: scale(1);
+  }
+}
+
+#quizTitle {
+  font-size: 2.2rem;
+  font-weight: bold;
+  color: #4CAF50;
+  margin-bottom: 18px;
+  letter-spacing: 2px;
+  text-shadow: 0 2px 8px #add8e6;
+}
+
+.question {
+  font-size: 2rem;
+  color: #222;
+  background: #e3f2fd;
+  border-radius: 12px;
+  padding: 12px 18px;
+  margin-bottom: 18px;
+  box-shadow: 0 2px 8px rgba(76, 175, 80, 0.08);
+  font-weight: bold;
+}
+
+.userAnswer {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 18px;
+}
+
+.userAnswer input {
+  width: 180px;
+  height: 56px;
+  font-size: 2rem;
+  border-radius: 14px;
+  border: 2px solid #4CAF50;
+  text-align: center;
+  font-family: 'PFStardustS', Arial, sans-serif;
+  font-weight: bold;
+  background: #fff;
+  color: #222;
+  box-shadow: 0 1px 6px #add8e6;
+  outline: none;
+  transition: border 0.2s;
+}
+
+.userAnswer input:focus {
+  border: 2.5px solid #2196F3;
 }
 
 #finalOverTitle,
@@ -180,18 +247,7 @@ canvas {
 .buttonBox {
   display: flex;
   flex-direction: row;
-  gap: 20px;
-}
-
-.retryButton,
-.restartButton {
-  background: linear-gradient(80deg, #fff, #add8e6);
-  border: none;
-  color: #000;
-  padding: 15px 40px;
-  font-size: 1.5rem;
-  border-radius: 25px;
-  cursor: pointer;
+  gap: 10px;
 }
 
 /* 문제 풀이 */
@@ -220,12 +276,92 @@ input {
   font-weight: bold;
 }
 
-#submitButton {
-  background: linear-gradient(80deg, #fff, #add8e6);
-  border: none;
-  color: #000;
-  padding: 10px 20px;
+/* 메인 */
+#gameScreen {
+  width: 100%;
+  height: 100%;
+}
+
+.interfaceBox {
+  width: 600px;
+  height: 80px;
+  display: flex;
+  flex-direction: row;
+  position: absolute;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px;
+
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.interfaceBox div {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+
+  width: calc(100% / 3);
+  height: 100%;
+  font-weight: bold;
   font-size: 1.5rem;
-  border-radius: 15px;
-  cursor: pointer;
+}
+
+.interfaceBox div p {
+  margin-left: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.interfaceBox .playBox {
+  justify-content: center;
+  align-items: center;
+}
+
+.interfaceBox .rightBox {
+  justify-content: center;
+  align-items: flex-end;
+}
+
+.interfaceBox span {
+  font-weight: bold;
+  color: #fff;
+  text-shadow: -2px 0px black, 0px 2px black, 2px 0px black, 0px -2px black;
+}
+
+.playBox button {
+  background: no-repeat center / contain;
+  width: calc(62px / 2);
+  height: calc(65px / 2);
+}
+
+.playBox .play {
+  background-image: url('assets/images/btn_play.png');
+}
+
+.playBox .pause {
+  background-image: url('assets/images/btn_pause.png');
+}
+
+.ico {
+  display: flex;
+  width: 40px;
+  height: 40px;
+  background: no-repeat center / contain;
+  margin-right: 10px;
+}
+
+.ico_count {
+  background-image: url('assets/images/ico_count.png');
+}
+
+.ico_score {
+  background-image: url('assets/images/ico_score.png');
+}
+
+.ico_distance {
+  background-image: url('assets/images/ico_distance.png');
 }

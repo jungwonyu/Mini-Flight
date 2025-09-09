@@ -3,9 +3,12 @@
 class SpawnSystem {
   // 스폰 시스템 재개 (resume)
   resumeSpawning() {
-    this.clearAllTimers();
-    this.isActive = true;
-    this.startSpawning();
+  this.clearAllTimers();
+  this.isActive = true;
+  this.startSpawning();
+  // 이어하기 직후 파워업 강제 스폰
+  this.hasPowerupActive = false;
+  this.spawnPowerup();
   }
   // key 오브젝트 스폰
   spawnKey() {
@@ -28,6 +31,7 @@ class SpawnSystem {
     keyObj.setAngularVelocity(180);
     return keyObj;
   }
+
   // 피버타임 코인 비 효과
   startFeverTimeCoinRain() {
     if (!this.scene || typeof isFeverTime === 'undefined') return;
@@ -42,9 +46,9 @@ class SpawnSystem {
         const y = yStart - i * yGap;
         const coin = coins.create(xPositions[j], y, 'coin');
         coin
-          .setScale(0.4)
+          .setScale(0.7)
           .setVelocityY(200)
-          .setVelocityX(Phaser.Math.Between(-30, 30));
+          .setVelocityX(Phaser.Math.Between(-30, 30)); // 코인 크기 증가
         coin.coinRotation = 0;
       }
     }
@@ -100,8 +104,9 @@ class SpawnSystem {
         });
       }
       enemy.anims.play('enemyFly', true);
-      enemy.setDisplaySize(100 * 1.2, 100 * 1.2); // 일반 적 크기 1.2배
+      enemy.setSize(enemy.width * 0.6, enemy.height * 0.6);
     }
+
     if (enemy.anims && enemy.texture && enemy.texture.key === 'king_enemy') {
       if (!enemy.scene.anims.exists('king_enemyFly')) {
         enemy.scene.anims.create({
@@ -112,7 +117,7 @@ class SpawnSystem {
         });
       }
       enemy.anims.play('king_enemyFly', true);
-      enemy.setDisplaySize(125 * 1.7, 100 * 1.7); // 킹에너미 크기 1.7배
+      enemy.setSize(enemy.width * 0.6, enemy.height * 0.6);
     }
 
     if (enemy.anims && enemy.texture && enemy.texture.key === 'king_king_enemy') {
@@ -125,10 +130,9 @@ class SpawnSystem {
         });
       }
       enemy.anims.play('king_king_enemyFly', true);
-      enemy.setDisplaySize(156 * 1.1, 200 * 1.1); // 킹킹에너미 크기 1.5배
+      enemy.setSize(enemy.width * 0.6, enemy.height * 0.6);
     }
 
-    // enemy.setScale(scale);
     enemy.setVelocityY(velocityY);
     if (tint) enemy.setTint(tint);
 
@@ -210,9 +214,7 @@ class SpawnSystem {
     if (typeof isFeverTime !== 'undefined' && isFeverTime) {
       // 적 스폰 중단, 대신 코인 비 효과만 유지
       // 피버타임이 끝나면 적 스폰 재개 예약
-      this.enemyTimer = this.scene.time.delayedCall(600, () =>
-        this.spawnEnemies()
-      );
+      this.enemyTimer = this.scene.time.delayedCall(600, () => this.spawnEnemies());
       return;
     }
     const enemyCount = Phaser.Math.Between(2, 3);
@@ -223,7 +225,7 @@ class SpawnSystem {
       const x = this.findNonOverlappingPosition(spawnedPositions, 80);
       spawnedPositions.push(x); // 새 위치를 배열에 추가
 
-    const enemy = enemies.create(x, -50, 'enemy');
+      const enemy = enemies.create(x, -50, 'enemy');
       this.setupEnemy( enemy, x, -50, 0.9, 150, null, GAME_CONSTANTS.ENEMY_HEALTH );
       // 체력바 생성
       const { healthBarBg, healthBarFill } = this.createHealthBar( x, -70, 60, 6, 0.6 );
@@ -233,9 +235,7 @@ class SpawnSystem {
 
     // 다음 스폰 예약
     this.enemyTimer = this.scheduleNextSpawn(
-      () => this.spawnEnemies(),
-      1500,
-      3000
+      () => this.spawnEnemies(), 1500, 3000
     );
   }
 
@@ -327,6 +327,7 @@ class SpawnSystem {
         });
       }
     });
+
     kingEnemies.children.iterate((kingEnemy) => {
       if (kingEnemy) {
         this.scene.tweens.add({
@@ -350,25 +351,10 @@ class SpawnSystem {
     this.createWarningEffect(0.8, 300, 6, () => {
       isKingKingEnemyActive = true;
       const kingKingEnemy = kingKingEnemies.create(240, -50, 'king_king_enemy');
-      this.setupEnemy(
-        kingKingEnemy,
-        240,
-        -50,
-        1.0, // 크기 감소
-        80,
-        GAME_COLORS.RED,
-        GAME_CONSTANTS.KING_KING_ENEMY_HEALTH
-      );
+      this.setupEnemy( kingKingEnemy, 240, -50, 1.0, 80, GAME_COLORS.RED, GAME_CONSTANTS.KING_KING_ENEMY_HEALTH );
 
       // 체력바 생성
-      const { healthBarBg, healthBarFill } = this.createHealthBar(
-        240,
-        -20,
-        150,
-        12,
-        0.8,
-        GAME_COLORS.RED
-      );
+      const { healthBarBg, healthBarFill } = this.createHealthBar( 240, -20, 150, 12, 0.8, GAME_COLORS.RED );
       kingKingEnemy.healthBarBg = healthBarBg;
       kingKingEnemy.healthBarFill = healthBarFill;
 
@@ -480,7 +466,8 @@ class SpawnSystem {
 
   // 파워업 스폰
   spawnPowerup() {
-    if (isGameOver || !this.isActive || this.hasPowerupActive) return;
+  // 이어하기(재시작) 직후에도 파워업이 반드시 나오게 수정
+  if (isGameOver || this.hasPowerupActive) return;
 
     // 파워업이 화면에 있는지 체크
     let activePowerups = 0;

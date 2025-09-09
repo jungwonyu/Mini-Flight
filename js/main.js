@@ -9,86 +9,117 @@ let gameManager;
 // 게임 리소스 로드
 function preload() {
   // image
-  // this.load.image('bg', 'assets/bg2.png');
-  this.load.image('bg', 'assets/bg3.png');
-  this.load.image('bg_fever', 'assets/bg_fever.png');
-  // this.load.image('bg', 'assets/background.png');
-  // this.load.image('player', 'assets/player.png');
-  // this.load.image('player', 'assets/player1.png');
+  this.load.image('bg', 'assets/images/bg.png');
+  this.load.image('bg_fever', 'assets/images/bg_fever.png');
+
   // 캐릭터 이미지 로드
-  // this.load.image('player', 'assets/player2.png');
-  this.load.spritesheet('player', 'assets/player2.png', { frameWidth: 150, frameHeight: 150 });
-  this.load.image('bullet', 'https://labs.phaser.io/assets/sprites/bullet.png');
+  this.load.spritesheet('player', 'assets/images/player.png', { frameWidth: 150, frameHeight: 150 });
+  this.load.spritesheet('player_double', 'assets/images/player_double.png', { frameWidth: 150, frameHeight: 150 });
+  this.load.spritesheet('player_fever', 'assets/images/player_fever.png', { frameWidth: 150, frameHeight: 150 });
+  this.load.image('bullet', 'assets/images/bullet.png');
   this.load.image('enemyBullet', 'https://labs.phaser.io/assets/sprites/enemy-bullet.png');
-  // this.load.image('enemy', 'assets/enemy.png');
-  // this.load.image('king_enemy', 'assets/king_enemy.png');
-  // this.load.image('king_king_enemy', 'assets/king_king_enemy.png');
-  // this.load.image('enemy', 'assets/enemy1.png');
-  this.load.spritesheet('enemy', 'assets/enemy11.png', { frameWidth: 100, frameHeight: 100 });
-  // this.load.image('king_enemy', 'assets/enemy2.png');
-  this.load.spritesheet('king_enemy', 'assets/enemy22.png',  { frameWidth: 123, frameHeight: 100 });
-  // this.load.image('king_king_enemy', 'assets/enemy3.png');
-  this.load.spritesheet('king_king_enemy', 'assets/enemy33.png', { frameWidth: 156, frameHeight: 200 });
-  
-  // this.load.image('coin', 'assets/coin.png');
-  this.load.image('coin', 'assets/coin2.png');
-  // this.load.image('powerup', 'assets/powerup.png');
-  this.load.image('powerup', 'assets/powerup2.png');
-  this.load.image('potion', 'assets/potion.png');
-  this.load.image('key', 'assets/key.png');
+
+  this.load.spritesheet('enemy', 'assets/images/enemy11.png', { frameWidth: 100, frameHeight: 100 });
+  this.load.spritesheet('king_enemy', 'assets/images/enemy22.png',  { frameWidth: 178, frameHeight: 150 });
+  this.load.spritesheet('king_king_enemy', 'assets/images/enemy33.png', { frameWidth: 156, frameHeight: 200 });
+
+  this.load.spritesheet('coin', 'assets/images/coin.png', { frameWidth: 36, frameHeight: 36 });
+  this.load.image('powerup', 'assets/images/helper1.png');
+  this.load.image('potion', 'assets/images/helper2.png');
+  this.load.image('key', 'assets/images/key.png');
+
   // sound
-  this.load.audio('coinSound', 'assets/coin.wav');
-  this.load.audio('explosionSound', 'assets/explosion.wav');
-  this.load.audio('powerupSound', 'assets/powerup.wav');
-  // this.load.audio('bgm', 'assets/bgm.wav');
-  this.load.audio('bgm', 'assets/emergence.ogg');
-  this.load.audio('gameOverSound', 'assets/gameover.wav');
-  this.load.audio('enemyHitSound', 'assets/enemyhit.mp3');
-  this.load.audio('feverSound', 'assets/fever.ogg');
-  this.load.audio('successSound', 'assets/success.mp3');
-  this.load.audio('failSound', 'assets/fail.mp3');
-  this.load.audio('buttonSound', 'assets/button.mp3');
-  // this.load.audio('emergenceSound', 'assets/emergence.ogg');
+  this.load.audio('bgm', 'assets/sounds/bgm2.mp3');
+  this.load.audio('gameOverBgm', 'assets/sounds/gameover.mp3');
+  this.load.audio('feverBgm', 'assets/sounds/fever_bgm.mp3');
+
+  this.load.audio('coinSound', 'assets/sounds/coin.wav');
+  this.load.audio('explosionSound', 'assets/sounds/explosion.wav');
+  this.load.audio('powerupSound', 'assets/sounds/powerup.wav');
+  this.load.audio('enemyHitSound', 'assets/sounds/enemyhit.mp3');
+  this.load.audio('successSound', 'assets/sounds/success.mp3');
+  this.load.audio('failSound', 'assets/sounds/fail.mp3');
+  this.load.audio('buttonSound', 'assets/sounds/button.mp3');
 }
 
 // 게임 오브젝트 생성 및 초기화
 function create() {
-  // 시스템 인스턴스 생성
   spawnSystem = new SpawnSystem(this);
   collisionSystem = new CollisionSystem(this);
   inputSystem = new InputSystem(this);
   gameManager = new GameManager(this);
   
-  // 시스템을 씬에 저장 (스폰 함수들을 위해)
   this.spawnSystem = spawnSystem;
   this.collisionSystem = collisionSystem;
   this.gameManager = gameManager;
 
+  const playButton = document.querySelector('.play');
+  const pauseButton = document.querySelector('.pause');
+
+  pauseButton?.addEventListener('click', () => {
+    if (this.physics) this.physics.pause();
+    if (this.time) this.time.paused = true;
+    if (this.tweens) this.tweens.pauseAll();
+    if (this.anims) this.anims.pauseAll();
+    gameState = 'paused';
+    pauseButton.classList.add('hidden');
+    playButton.classList.remove('hidden');
+    if (this.bgm && this.bgm.isPlaying) { this.bgm.pause(); }
+    if (this.feverBgm && this.feverBgm.isPlaying) { this.feverBgm.pause(); }
+  });
+
+  playButton?.addEventListener('click', () => {
+    if (this.physics) this.physics.resume();
+    if (this.time) this.time.paused = false;
+    if (this.tweens) this.tweens.resumeAll();
+    if (this.anims) this.anims.resumeAll();
+    gameState = 'playing';
+    playButton.classList.add('hidden');
+    pauseButton.classList.remove('hidden');
+    if (this.bgm && !this.bgm.isPlaying) { this.bgm.resume(); }
+    if (isFeverTime && this.feverBgm && !this.feverBgm.isPlaying) { this.feverBgm.resume(); }
+  });
+
   // 효과음 객체 생성 및 저장
+  this.bgm = this.sound.add('bgm', { loop: true, volume: 0.5 });
+  this.feverBgm = this.sound.add('feverBgm');
+  this.gameOverBgm = this.sound.add('gameOverBgm');
   this.coinSound = this.sound.add('coinSound');
   this.explosionSound = this.sound.add('explosionSound');
   this.powerupSound = this.sound.add('powerupSound');
-  this.gameOverSound = this.sound.add('gameOverSound');
   this.enemyHitSound = this.sound.add('enemyHitSound');
-  this.feverSound = this.sound.add('feverSound');
   this.successSound = this.sound.add('successSound');
   this.failSound = this.sound.add('failSound');
   this.buttonSound = this.sound.add('buttonSound');
-
-  // 배경 음악 객체 생성만 (재생은 start 버튼에서)
-  this.bgm = this.sound.add('bgm', { loop: true, volume: 0.5 });
 
   // 배경을 tileSprite로 복구
   background = this.add.tileSprite(0, 0, 480, 800, 'bg').setOrigin(0);
   background.isFever = false;
 
-  // 플레이어
-  player = this.physics.add.sprite(240, 200, 'player', 0);
-  player.setCircle(30, 20, 20);
-
   this.anims.create({
     key: 'fly',
     frames: this.anims.generateFrameNumbers('player', { start: 0, end: 1 }),
+    frameRate: 5,
+    repeat: -1
+  });
+
+  this.anims.create({
+    key: 'fly2',
+    frames: this.anims.generateFrameNumbers('player_double', { start: 0, end: 1 }),
+    frameRate: 5,
+    repeat: -1
+  });
+
+  this.anims.create({
+    key: 'fly3',
+    frames: this.anims.generateFrameNumbers('player_fever', { start: 0, end: 1 }),
+    frameRate: 5,
+    repeat: -1
+  });
+
+  this.anims.create({
+    key: 'coin',
+    frames: this.anims.generateFrameNumbers('coin', { start: 0, end: 1 }),
     frameRate: 5,
     repeat: -1
   });
@@ -114,17 +145,18 @@ function create() {
     repeat: -1
   });
 
+  player = this.physics.add.sprite(240, 720, 'player')
   player.anims.play('fly', true);
+  player.setSize(player.width * 0.5, player.height * 0.7);
   player.setCollideWorldBounds(true);
   player.setVisible(false); // 시작 화면에서는 숨김
+
+  coin = this.physics.add.staticSprite(this.scale.width + 50, this.pathY, 'coin');
+  coin.anims.play('coin', true);
 
   // 게임 오브젝트 그룹 생성
   bullets = this.physics.add.group();
   enemies = this.physics.add.group();
-  // 적 히트박스(충돌 영역) 축소
-  enemies.children.iterate((enemy) => {
-    if (enemy) enemy.setCircle(30, 20, 20);
-  });
   kingEnemies = this.physics.add.group();
   kingKingEnemies = this.physics.add.group();
   enemyBullets = this.physics.add.group();
@@ -136,12 +168,15 @@ function create() {
   // 화면 왼쪽 하단에 key 아이콘 1개와 x3 숫자 표시
   keyInventoryCount = 3;
   keyInventoryIcon = this.add.image(40, 780, 'key').setScale(0.5).setDepth(10);
-  keyInventoryText = this.add.text(65, 770, keyInventoryCount, {
-    fontSize: '22px', fill: '#ffe066', fontFamily: 'PFStardustS, Arial, sans-serif', stroke: '#333', strokeThickness: 3
-  }).setDepth(10);
+  keyInventoryText = this.add.text(65, 770, keyInventoryCount, { fontSize: '22px', fill: '#ffe066', fontFamily: 'PFStardustS, Arial, sans-serif', stroke: '#000', strokeThickness: 5 }).setDepth(10);
 
-  // UI 텍스트 생성
-  createUIElements.call(this);
+  const scoreElement = document.getElementById('score');
+  const gameOverCountElement = document.getElementById('gameOverCount');
+  const distanceElement = document.getElementById('distance');
+
+  scoreElement.innerText = score;
+  gameOverCountElement.innerText = gameOverCount;
+  distanceElement.innerText = distance;
 
   // 경고 오버레이
   warningOverlay = this.add.rectangle(240, 400, 480, 800, 0xff0000, 0.8);
@@ -168,38 +203,18 @@ function update(time) {
   gameManager.updateCoinAnimations();
 }
 
-// UI 요소 생성
-function createUIElements() {
-  scoreText = this.add.text(10, 10, 'Score: 0', {
-    fontSize: '20px',
-    fill: '#ffffff',
-    fontFamily: 'PFStardustS, Arial, sans-serif'
-  });
-  gameOverCountText = this.add.text(10, 35, 'Game Over: 0', {
-    fontSize: '18px',
-    fill: '#ff6666',
-    fontFamily: 'PFStardustS, Arial, sans-serif'
-  });
-  scoreText.setVisible(false);
-  gameOverCountText.setVisible(false);
-
-  distanceText = this.add.text(480 - 10, 10, 'Distance: 0m', {
-    fontSize: '20px',
-    fill: '#ffffff',
-    fontFamily: 'PFStardustS, Arial, sans-serif'
-  }).setOrigin(1, 0);
-  distanceText.setVisible(false);
-}
-
 // HTML 시작 버튼 이벤트 연결
 function setupStartButton() {
   const startButton = document.getElementById('startButton');
   const startScreen = document.getElementById('startScreen');
+  const gameScreen = document.getElementById('gameScreen');
+  // const canvas = document.querySelector('canvas');
   
   if (startButton) {
     startButton.addEventListener('click', () => {
       startGame.call(this);
       startScreen.classList.add('hidden');
+      gameScreen.classList.remove('hidden');
     });
   }
 }
@@ -208,22 +223,28 @@ function setupStartButton() {
 function startGame() {
   // 완전한 게임 상태 초기화 (다시하기와 동일)
   gameManager.resetGameState();
+  // 점수 UI도 0으로 초기화
+  const scoreElement = document.getElementById('score');
+  if (scoreElement) scoreElement.innerText = 0;
   
   // 게임 상태를 playing으로 변경
   gameState = 'playing';
   
   // 게임 UI 표시
-  scoreText.setVisible(true);
-  gameOverCountText.setVisible(true);
-  distanceText.setVisible(true);
   player.setVisible(true);
   
   // 스폰 시작
   startSpawning.call(this);
-    // 배경음악 재생 (이미 재생 중이면 중복 방지)
-    if (this.bgm && !this.bgm.isPlaying) {
-      this.bgm.play();
-    }
+  spawnSystem.hasPowerupActive = false;
+  isFeverTime = false;
+  spawnSystem.spawnPowerup();  // 첫 powerup 즉시 스폰
+
+  // 피버타임 코인 비 효과도 즉시 시작 (피버타임 상태일 때만)
+  // if (isFeverTime) spawnSystem.startFeverTimeCoinRain();
+  // 배경음악 재생 (이미 재생 중이면 중복 방지)
+  if (this.bgm && !this.bgm.isPlaying) {
+    this.bgm.play();
+  }
 }
 
 // 스폰 시작
@@ -240,60 +261,26 @@ function startSpawning() {
 // 충돌 처리 설정
 function setupCollisions() {
   // 총알 vs 적들
-  this.physics.add.overlap(bullets, enemies, (bullet, enemy) => {
-    collisionSystem.hitEnemy(bullet, enemy);
-  }, null, this);
-  
-  this.physics.add.overlap(bullets, kingEnemies, (bullet, kingEnemy) => {
-    collisionSystem.hitKingEnemy(bullet, kingEnemy);
-  }, null, this);
-  
-  this.physics.add.overlap(bullets, kingKingEnemies, (bullet, kingKingEnemy) => {
-    collisionSystem.hitKingKingEnemy(bullet, kingKingEnemy);
-  }, null, this);
+  this.physics.add.overlap(bullets, enemies, (bullet, enemy) => collisionSystem.hitEnemy(bullet, enemy), null, this);
+  this.physics.add.overlap(bullets, kingEnemies, (bullet, kingEnemy) => collisionSystem.hitKingEnemy(bullet, kingEnemy), null, this);
+  this.physics.add.overlap(bullets, kingKingEnemies, (bullet, kingKingEnemy) =>  collisionSystem.hitKingKingEnemy(bullet, kingKingEnemy), null, this);
 
   // 플레이어 vs 적들
-  this.physics.add.overlap(player, enemies, (player, enemy) => {
-    collisionSystem.playerHit(player, enemy);
-  }, null, this);
-  
-  this.physics.add.overlap(player, kingEnemies, (player, kingEnemy) => {
-    collisionSystem.playerHit(player, kingEnemy);
-  }, null, this);
-  
-  this.physics.add.overlap(player, kingKingEnemies, (player, kingKingEnemy) => {
-    collisionSystem.playerHit(player, kingKingEnemy);
-  }, null, this);
+  this.physics.add.overlap(player, enemies, (player, enemy) => collisionSystem.playerHit(player, enemy), null, this);
+  this.physics.add.overlap(player, kingEnemies, (player, kingEnemy) => collisionSystem.playerHit(player, kingEnemy), null, this);
+  this.physics.add.overlap(player, kingKingEnemies, (player, kingKingEnemy) => collisionSystem.playerHit(player, kingKingEnemy), null, this);
 
   // 플레이어 vs 총알
-  this.physics.add.overlap(player, enemyBullets, (player, enemyBullet) => {
-    collisionSystem.playerHitByBullet(player, enemyBullet);
-  }, null, this);
+  this.physics.add.overlap(player, enemyBullets, (player, enemyBullet) => collisionSystem.playerHitByBullet(player, enemyBullet), null, this);
 
   // 수집 아이템들
-  this.physics.add.overlap(player, coins, (player, coin) => {
-    collisionSystem.collectCoin(player, coin);
-  }, null, this);
-  
-  this.physics.add.overlap(player, powerups, (player, powerup) => {
-    collisionSystem.collectPowerup(player, powerup);
-  }, null, this);
-
-  // 플레이어 vs 포션
-  this.physics.add.overlap(player, potions, (player, potion) => {
-    collisionSystem.collectPotion(player, potion);
-  }, null, this);
-
-  // 플레이어 vs 키
+  this.physics.add.overlap(player, coins, (player, coin) => collisionSystem.collectCoin(player, coin), null, this);
+  this.physics.add.overlap(player, powerups, (player, powerup) => collisionSystem.collectPowerup(player, powerup), null, this);
+  this.physics.add.overlap(player, potions, (player, potion) => collisionSystem.collectPotion(player, potion), null, this);
   this.physics.add.overlap(player, keys, (player, keyObj) => {
-    if (!keyObj.isInventory) {
-      collisionSystem.collectKey(player, keyObj);
-    }
+    if (!keyObj.isInventory) collisionSystem.collectKey(player, keyObj)
   }, null, this);
 }
-
-// 재시작 함수
-let gameOverCount = 0;
 
 // 게임 시작
 const game = new Phaser.Game(config);

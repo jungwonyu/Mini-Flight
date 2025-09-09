@@ -1,5 +1,3 @@
-// 게임 매니저 - 게임 상태 관리 및 업데이트
-
 class GameManager {
   constructor(scene) {
     this.scene = scene;
@@ -34,7 +32,7 @@ class GameManager {
 
     // 플레이어 초기화
     if (player) {
-      player.setPosition(240, 700);
+      player.setPosition(240, 720);
       player.setVelocity(0, 0);
       player.clearTint();
       player.setVisible(false);
@@ -46,14 +44,14 @@ class GameManager {
       background.tilePositionY = 0;
     }
 
-    // UI 텍스트 초기화
-    if (scoreText) {
-      scoreText.setText('Score: 0');
-      scoreText.setVisible(false);
+    // UI 텍스트 초기화 (HTML)
+    if (typeof scoreText !== 'undefined' && scoreText) {
+      scoreText.innerText = 'Score: 0';
+      // scoreText.style.display = 'none';
     }
-    if (distanceText) {
-      distanceText.setText('Distance: 0m');
-      distanceText.setVisible(false);
+    if (typeof distanceText !== 'undefined' && distanceText) {
+      distanceText.innerText = 'Distance: 0m';
+      // distanceText.style.display = 'none';
     }
 
     // 경고 오버레이 숨김
@@ -177,7 +175,14 @@ class GameManager {
 
     // 주행거리 업데이트
     distance += 2;
-    distanceText.setText('Distance: ' + Math.floor(distance / 10) + 'm');
+    document.getElementById('distance').innerText = Math.floor(distance / 10) + 'm';
+
+
+    // HTML 거리 표시 업데이트
+    // if (typeof distanceText !== 'undefined' && distanceText) {
+    //   distanceText.innerText = 'Distance: ' + Math.floor(distance / 10) + 'm';
+    // }
+
   }
 
   // 보스 스폰 체크
@@ -241,8 +246,8 @@ class GameManager {
         kingKingEnemy.destroy();
       } else if (kingKingEnemy && kingKingEnemy.active) {
         // 체력바 위치 업데이트
-        this.updateHealthBarPosition(kingKingEnemy, -50);
-      }
+        this.updateHealthBarPosition(kingKingEnemy, -40);
+        }
     });
 
     // 적 총알 정리
@@ -259,19 +264,8 @@ class GameManager {
   // 동전 애니메이션 업데이트
   updateCoinAnimations() {
     coins.children.iterate((coin) => {
-      if (coin && coin.y > 850) {
-        coin.destroy();
-      } else if (coin && coin.active) {
-        // 동전 회전 애니메이션
-        coin.coinRotation += 0.15;
-        const x = Math.cos(coin.coinRotation) * 0.4;
-        coin.setScale(Math.abs(x), 0.4);
-        
-        if (Math.cos(coin.coinRotation) < 0) {
-          coin.setTint(0xcccccc); // 뒷면
-        } else {
-          coin.clearTint(); // 앞면
-        }
+      if (coin) {
+        coin.anims.play('coin', true);
       }
     });
   }

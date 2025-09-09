@@ -7,7 +7,8 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="mobile-web-app-capable" content="yes">
-  <title>아이스의 모험</title>
+  <title>Ice's Adventure</title>
+  <link rel="icon" type="image/x-icon" href="assets/favicon.ico">
   <link rel="stylesheet" href="style.css">
   <script src="https://cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser.js"></script>
 </head>
@@ -15,36 +16,50 @@
 <body>
   <!-- 시작 화면 -->
   <div id="startScreen">
-    <h1 id="gameTitle">아이스의 모험</h1>
+    <h1 id="gameTitle">Ice's Adventure</h1>
     <button id="startButton">START</button>
-    <div id="controls">
-      PC: 키보드로 이동<br>
-      모바일: 터치로 이동 및 발사
+  </div>
+
+  <!-- 게임 화면 -->
+  <div id="gameScreen" class="hidden">
+    <div class="interfaceBox">
+      <div class="leftBox">
+        <p><span class="ico ico_score"></span><span id="score">0</span></p>
+        <p><span class="ico ico_count"></span><span id="gameOverCount">0</span></p>
+      </div>
+
+      <div class="playBox">
+        <button class="play hidden"></button>
+        <button class="pause"></button>
+      </div>
+
+      <div class="rightBox">
+        <p><span class="ico ico_distance"></span><span id="distance">0m</span></p>
+      </div>
     </div>
   </div>
 
   <!-- 게임 오버 화면 -->
   <div id="gameOverScreen" class="hidden">
-    <h2 id="gameOverTitle">적과의 충돌!</h2>
+    <h2 id="gameOverTitle">충돌!</h2>
     <div id="gameOverInfo"></div>
     <div class="buttonBox">
-      <button class="retryButton">이어서 하기</button>
+      <button class="retryButton">이어 하기</button>
       <button class="restartButton">다시 하기</button>
     </div>
   </div>
 
-  <!-- 카운트다운 박스: 반드시 body 바로 아래에 위치 -->
   <div id="countdownBox" class="hidden">
-    <h2 id="countdownText" style="font-size:4rem; color:#fff; margin-top:30px;">3</h2>
+    <h2 id="countdownText">3</h2>
   </div>
 
   <!-- 문제 풀이 화면 -->
   <div id="quizScreen" class="hidden">
-    <h2 id="quizTitle">문제 풀이</h2>
-    <div id="quizInfo">
+    <div id="quizCard">
+      <div id="quizTitle">QUIZ</div>
       <div class="question">2+3=</div>
       <div class="userAnswer">
-        <input type="text" data-answer="5" />
+        <input type="text" data-answer="5" placeholder="정답 입력" />
       </div>
       <button id="submitButton">제출</button>
     </div>
@@ -63,9 +78,7 @@
   <!-- 키 부족 화면 -->
   <div id="finalOverScreen" class="hidden">
     <h2 id="finalOverTitle">키가 부족합니다!</h2>
-    <div class="buttonBox">
-      <button class="restartButton">처음으로</button>
-    </div>
+    <div class="buttonBox"><button class="restartButton">처음으로</button></div>
   </div>
 
   <script src="js/config.js"></script>

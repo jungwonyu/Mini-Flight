@@ -1,6 +1,26 @@
 // 충돌 처리 시스템
 
 class CollisionSystem {
+  // 점수 팝업 표시 (플레이어 위)
+  showScorePopup(points) {
+    if (!this.scene || !player) return;
+    const popup = this.scene.add.text(player.x, player.y - 40, `+${points}`, {
+      fontSize: '24px',
+      fill: '#fad852ff',
+      fontFamily: 'PFStardustS, Arial, sans-serif',
+      fontWeight: 'bold',
+      stroke: '#000',
+      strokeThickness: 5
+    }).setOrigin(0.5);
+    this.scene.tweens.add({
+      targets: popup,
+      y: player.y - 80,
+      alpha: 0,
+      duration: 700,
+      onComplete: () => popup.destroy()
+    });
+  }
+
   // 킹/킹킹 enemy 죽으면 키 드랍
   dropKey(x, y) {
     if (typeof keys === 'undefined' || !keys) {
@@ -46,10 +66,12 @@ class CollisionSystem {
     }, 100);
 
     isPlayerInvincible = true;
-    player.setTint(GAME_COLORS.PLAYER_INVINCIBLE);
-    if (this.scene.feverSound) {
-      this.scene.bgm.stop();
-      this.scene.feverSound.play();
+    player.setTexture('player_fever');
+    player.anims.play('fly3', true);
+
+    if (this.scene.feverBgm) {
+      this.scene.bgm.pause();
+      this.scene.feverBgm.play();
     }
     // 피버타임 시작
     isFeverTime = true;
@@ -67,7 +89,10 @@ class CollisionSystem {
     this.scene.time.delayedCall(5000, () => {
       isPlayerInvincible = false;
       isFeverTime = false;
-      if (player && player.active) player.clearTint();
+      if (player && player.active) {
+        player.setTexture('player');
+        player.anims.play('fly', true);
+      }
       // 피버타임 종료 시 배경 복구
       if (typeof background !== 'undefined' && background && background.isFever) {
         background.setTexture('bg');
@@ -92,8 +117,8 @@ class CollisionSystem {
       }
 
       // 피버사운드 종료
-      if (this.scene.feverSound) {
-        this.scene.feverSound.stop();
+      if (this.scene.feverBgm) {
+        this.scene.feverBgm.stop();
         this.scene.bgm.play();
       }
     });
@@ -128,31 +153,35 @@ class CollisionSystem {
     // 회전 효과
     potion.setAngularVelocity(360);
   }
+
+  // 적 체력바 업데이트 공통 함수
   getEnemyConfig(enemyType) {
     const configs = {
       'normal': {
         healthBarWidth: 60,
         tintColor: GAME_COLORS.NORMAL_ENEMY,
-        baseScale: 0.7,
-        scaleMultiplier: 0.5, // 더 크게 줄어듦
+        baseScale: 0.6,
+        scaleMultiplier: 0.4,
         coinDrop: 1,
         destroyScore: 5,
         hitScore: 2
       },
+
       'king': {
         healthBarWidth: 100,
         tintColor: GAME_COLORS.KING_ENEMY,
-        baseScale: 0.8,
-        scaleMultiplier: 0.3, // 더 크게 줄어듦
+        baseScale: 0.6,
+        scaleMultiplier: 0.4,
         coinDrop: 5,
         destroyScore: 100,
         hitScore: 5
       },
+
       'kingking': {
         healthBarWidth: 150,
         tintColor: GAME_COLORS.KING_KING_ENEMY,
-        baseScale: 1.2,
-        scaleMultiplier: 0.3,
+        baseScale: 0.6,
+        scaleMultiplier: 0.4,
         coinDrop: 10,
         destroyScore: 300,
         hitScore: 8
@@ -160,6 +189,7 @@ class CollisionSystem {
     };
     return configs[enemyType];
   }
+  
   constructor(scene) {
     this.scene = scene;
   }
@@ -178,26 +208,12 @@ class CollisionSystem {
     this.createHitEffect(enemy, config.tintColor);
 
     // 적 피격 효과음 재생
-    if (this.scene.enemyHitSound) {
-      this.scene.enemyHitSound.play();
-    }
+    if (this.scene.enemyHitSound) this.scene.enemyHitSound.play();
     
     // 체력에 따라 크기 조정
     const healthRatio = enemy.health / enemy.maxHealth;
-      if (enemy.texture && enemy.texture.key === 'king_enemy') {
-        // king_enemy는 displaySize로 크기 조정
-        const baseW = 123, baseH = 100;
-        const scale = 1.1 + healthRatio;
-        enemy.setDisplaySize(baseW * scale, baseH * scale);
-      } else if (enemy.texture && enemy.texture.key === 'king_king_enemy') {
-        // king_king_enemy도 displaySize로 크기 조정
-        const baseW = 156, baseH = 200;
-        const scale = 1.0 + healthRatio; // 최소 1배 ~ 최대 2배
-        enemy.setDisplaySize(baseW * scale, baseH * scale);
-      } else {
-        // 일반 적은 기존 방식 유지
-        enemy.setScale(config.baseScale + (healthRatio * config.scaleMultiplier));
-      }
+
+    enemy.setScale(config.baseScale + (healthRatio * config.scaleMultiplier));
     
     if (enemy.health <= 0) {
       this.destroyEnemy(enemy, config.coinDrop, config.destroyScore);
@@ -224,11 +240,9 @@ class CollisionSystem {
   // 점수 업데이트 공통 함수
   updateScore(points) {
     score += points;
-    scoreText.setText('Score: ' + score);
-    // 게임 오버 횟수도 업데이트
-    if (typeof gameOverCountText !== 'undefined' && gameOverCountText) {
-      gameOverCountText.setText('Game Over: ' + gameOverCount);
-    }
+    document.getElementById('score').innerText = score;
+    document.getElementById('gameOverCount').innerText = gameOverCount;
+    this.showScorePopup(points);
   }
 
   // 동전 수집
@@ -266,16 +280,18 @@ class CollisionSystem {
       }
     });
     
-    // 플레이어 색상 변화
-    player.setTint(GAME_COLORS.PLAYER_POWERUP);
-    
-    // 5초 후 원래 색으로 되돌리기
+    // 플레이어 이미지 변경 (player_double)
+    player.setTexture('player_double');
+    player.anims.play('fly2', true);
+
     this.scene.time.delayedCall(GAME_CONSTANTS.POWERUP_DURATION, () => {
+      isDoubleBullet = false;
       if (player && player.active) {
-        player.clearTint();
+        player.setTexture('player');
+        player.anims.play('fly', true);
       }
     });
-    
+        
     this.updateScore(10);
     // 효과음 재생
     if (this.scene.powerupSound) this.scene.powerupSound.play();
@@ -317,18 +333,12 @@ class CollisionSystem {
     isGameOver = true;
     gameState = 'gameover';
     gameOverCount++;
-    if (typeof gameOverCountText !== 'undefined' && gameOverCountText) {
-      gameOverCountText.setText('Game Over: ' + gameOverCount);
-    }
+    document.getElementById('gameOverCount').innerText = gameOverCount;
     this.scene.physics.pause();
     player.setTint(GAME_COLORS.GAME_OVER);
 
     // 진동 효과
     this.scene.cameras.main.shake(300, 0.015);
-
-    // Phaser UI 숨김
-    // if (typeof scoreText !== 'undefined') scoreText.setVisible(false);
-    // if (typeof distanceText !== 'undefined') distanceText.setVisible(false);
 
     // HTML 게임 오버 화면 표시
     const gameOverScreen = document.getElementById('gameOverScreen');
@@ -367,6 +377,7 @@ class CollisionSystem {
       // 다시하기 버튼 이벤트 연결 (중복 방지)
       restartButtons.forEach(btn => {
         btn.onclick = () => {
+          if (this.scene.gameOverBgm) this.scene.gameOverBgm.stop();
           if (this.scene.buttonSound) this.scene.buttonSound.play();
           wrongAnswerScreen.classList.add('hidden');
           gameOverScreen.classList.add('hidden');
@@ -380,8 +391,8 @@ class CollisionSystem {
       // 이어서 하기
       retryButtons.forEach(btn => {
         btn.onclick = () => {
+          if (this.scene.gameOverBgm) this.scene.gameOverBgm.stop();
           if (this.scene.buttonSound) this.scene.buttonSound.play();
-          // 키 인벤토리 숫자 감소 (gameOverCount만큼)
           if (typeof keyInventoryCount === 'undefined') keyInventoryCount = 0;
           if (keyInventoryCount < gameOverCount) {
             quizScreen.classList.add('hidden');
@@ -400,7 +411,6 @@ class CollisionSystem {
 
           // 퀴즈와 정답 넣기
           answerElement.value = '';
-          // const randomNum = quizData 길이 중 랜덤 숫자
           const randomNum = Phaser.Math.Between(0, quizData.length - 1);
           const randomQuiz = quizData[randomNum];
           questionElement.textContent = randomQuiz.question; // 랜덤 문제 보여주기
@@ -420,9 +430,7 @@ class CollisionSystem {
             gameOverScreen.classList.add('hidden');
             countdownBox.classList.remove('hidden');
             
-            if (this.scene.successSound) {        
-              this.scene.successSound.play();
-            }
+            if (this.scene.successSound) this.scene.successSound.play();
 
             let count = 3;
             countdownText.textContent = count;
@@ -433,57 +441,56 @@ class CollisionSystem {
               } else {
                 clearInterval(countdownInterval);
                 countdownBox.classList.add('hidden');
+
                 // 게임 이어서 진행
                 isGameOver = false;
                 gameState = 'playing';
                 this.scene.physics.resume();
+
                 if (typeof player !== 'undefined' && player) {
                   player.setVisible(true);
                   player.clearTint();
                 }
-                if (typeof scoreText !== 'undefined' && scoreText) scoreText.setVisible(true);
-                if (typeof distanceText !== 'undefined' && distanceText) distanceText.setVisible(true);
-                  // 화면에 있는 모든 적 제거
-                  if (typeof enemies !== 'undefined' && enemies) {
-                    enemies.children.iterate((enemy) => {
-                      if (enemy && enemy.active) {
-                        if (typeof this.removeEnemyHealthBar === 'function') this.removeEnemyHealthBar(enemy);
-                        enemy.destroy();
-                      }
-                    });
-                  }
-                  if (typeof kingEnemies !== 'undefined' && kingEnemies) {
-                    kingEnemies.children.iterate((enemy) => {
-                      if (enemy && enemy.active) {
-                        if (typeof this.removeEnemyHealthBar === 'function') this.removeEnemyHealthBar(enemy);
-                        enemy.destroy();
-                      }
-                    });
-                  }
-                  if (typeof kingKingEnemies !== 'undefined' && kingKingEnemies) {
-                    kingKingEnemies.children.iterate((enemy) => {
-                      if (enemy && enemy.active) {
-                        if (typeof this.removeEnemyHealthBar === 'function') this.removeEnemyHealthBar(enemy);
-                        enemy.destroy();
-                      }
-                    });
-                  }
-                  // 1초 후 적 스폰 재개
-                  setTimeout(() => {
-                    if (this.scene.spawnSystem && typeof this.scene.spawnSystem.resumeSpawning === 'function') {
-                      this.scene.spawnSystem.resumeSpawning();
+
+                // 화면에 있는 모든 적 제거
+                if (typeof enemies !== 'undefined' && enemies) {
+                  enemies.children.iterate((enemy) => {
+                    if (enemy && enemy.active) {
+                      if (typeof this.removeEnemyHealthBar === 'function') this.removeEnemyHealthBar(enemy);
+                      enemy.destroy();
                     }
-                    if (this.scene.bgm && typeof this.scene.bgm.play === 'function') {
-                      this.scene.bgm.play();
+                  });
+                }
+                if (typeof kingEnemies !== 'undefined' && kingEnemies) {
+                  kingEnemies.children.iterate((enemy) => {
+                    if (enemy && enemy.active) {
+                      if (typeof this.removeEnemyHealthBar === 'function') this.removeEnemyHealthBar(enemy);
+                      enemy.destroy();
                     }
-                  }, 300);
+                  });
+                }
+                if (typeof kingKingEnemies !== 'undefined' && kingKingEnemies) {
+                  kingKingEnemies.children.iterate((enemy) => {
+                    if (enemy && enemy.active) {
+                      if (typeof this.removeEnemyHealthBar === 'function') this.removeEnemyHealthBar(enemy);
+                      enemy.destroy();
+                    }
+                  });
+                }
+                // 1초 후 적 스폰 재개
+                setTimeout(() => {
+                  if (this.scene.spawnSystem && typeof this.scene.spawnSystem.resumeSpawning === 'function') {
+                    this.scene.spawnSystem.resumeSpawning();
+                  }
+                  if (this.scene.bgm && typeof this.scene.bgm.play === 'function') {
+                    this.scene.bgm.play();
+                  }
+                }, 300);
               }
             }, 1000);
           }
         } else { // 오답인 경우
-          if (this.scene.failSound) {
-            this.scene.failSound.play();
-          }
+          if (this.scene.failSound) this.scene.failSound.play();
           gameOverScreen.classList.add('hidden');
           wrongAnswerScreen.classList.remove('hidden');
           wrongAnswerInfo.innerHTML = `Final Score: <b>${score}</b><br>Distance: <b>${Math.floor(distance / 10)}m</b>`;
@@ -492,15 +499,9 @@ class CollisionSystem {
         quizScreen.classList.add('hidden');
       };
     }
-    // 게임 오버 효과음 재생
-    if (this.scene.gameOverSound) {
-      this.scene.gameOverSound.play();
-    }
-
-    // 배경음악 정지
-    if (this.scene.bgm && this.scene.bgm.isPlaying) {
-      this.scene.bgm.stop();
-    }
+    
+    if (this.scene.gameOverBgm) this.scene.gameOverBgm.play(); // 게임 오버 효과음 재생
+    if (this.scene.bgm && this.scene.bgm.isPlaying) this.scene.bgm.stop(); // 배경음악 정지
   }
 
   // 체력바 업데이트
@@ -554,7 +555,7 @@ class CollisionSystem {
   dropCoins(x, y, coinCount) {
     for (let i = 0; i < coinCount; i++) {
       const coin = coins.create( x + Phaser.Math.Between(-40, 40), y + Phaser.Math.Between(-30, 30), 'coin');
-      coin.setScale(0.4).setVelocityY(200).setVelocityX(Phaser.Math.Between(-120, 120));
+      coin.setScale(0.7).setVelocityY(200).setVelocityX(Phaser.Math.Between(-120, 120)); // 코인 크기 증가
       coin.coinRotation = 0;
     }
   }
