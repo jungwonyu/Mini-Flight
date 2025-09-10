@@ -492,13 +492,28 @@ class SpawnSystem {
 
     const x = Phaser.Math.Between(50, 430);
     const powerup = powerups.create(x, -30, 'powerup');
-      powerup.setScale(0.5);
-      powerup.setVelocityY(120);
-  // 색상 tint 제거 (기본 이미지 색상)
+    powerup.setScale(0.5);
+    powerup.setVelocityY(120);
+    // 색상 tint 제거 (기본 이미지 색상)
 
     // 파워업이 제거될 때 플래그 리셋
     powerup.on('destroy', () => {
       this.hasPowerupActive = false;
+    });
+
+    // 파워업이 화면 밖으로 나가면 자동 destroy
+    powerup.update = () => {
+      if (powerup.y > this.scene.scale.height + 40) {
+        powerup.destroy();
+      }
+    };
+    // 모든 파워업에 대해 update 체크 (Phaser 그룹의 iterate 활용)
+    this.scene.events.on('update', () => {
+      powerups.children.iterate((powerup) => {
+        if (powerup && typeof powerup.update === 'function') {
+          powerup.update();
+        }
+      });
     });
 
     // 반짝이는 효과

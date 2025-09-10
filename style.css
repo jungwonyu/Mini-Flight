@@ -394,6 +394,13 @@ input {
   gap: 10px;
 }
 
+/* 충돌 */
+#gameOverScreen .playerImage {
+  width: 250px;
+  height: 250px;
+  background: url('assets/images/player_crash.png') no-repeat center / contain;
+}
+
 /* 오답 */
 #wrongAnswerScreen .playerImage {
   width: 150px;

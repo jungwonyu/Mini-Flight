@@ -47,6 +47,7 @@ function preload() {
   this.load.image('ico_distance', 'assets/images/ico_distance.png');
   this.load.image('btn_play', 'assets/images/btn_play.png');
   this.load.image('btn_pause', 'assets/images/btn_pause.png');
+  this.load.image('player_pause', 'assets/images/player_pause.png');
 }
 
 // 게임 오브젝트 생성 및 초기화
@@ -82,6 +83,10 @@ function create() {
       if (scene.anims) scene.anims.resumeAll();
       if (scene.bgm && !scene.bgm.isPlaying) { scene.bgm.resume(); }
       if (isFeverTime && scene.feverBgm && !scene.feverBgm.isPlaying) { scene.feverBgm.resume(); }
+      scene.children.list.forEach(child => {
+        if (child.texture && child.texture.key === 'player_pause') child.destroy();
+        if (child.type === 'Rectangle' && child.fillColor === 0x000000) child.destroy();
+      });
     });
 
     scene.pauseButton.on('pointerdown', () =>{
@@ -94,6 +99,8 @@ function create() {
       if (scene.anims) scene.anims.pauseAll();
       if (scene.bgm && scene.bgm.isPlaying) { scene.bgm.pause(); }
       if (scene.feverBgm && scene.feverBgm.isPlaying) { scene.feverBgm.pause(); }
+      scene.add.image(centerX, scene.scale.height / 2, 'player_pause').setScale(1).setDepth(200);
+      scene.add.rectangle(centerX, scene.scale.height / 2, scene.scale.width, scene.scale.height, 0x000000, 0.5).setDepth(99);
     });
   }
 
@@ -181,7 +188,7 @@ function create() {
   // 화면 왼쪽 하단에 key 아이콘 1개와 x3 숫자 표시
   keyInventoryCount = 3;
   keyInventoryIcon = this.add.image(40, 780, 'key').setScale(0.5).setDepth(10);
-  keyInventoryText = this.add.text(65, 770, keyInventoryCount, { fontSize: '22px', fill: '#ffe066', fontFamily: 'PFStardustS, Arial, sans-serif', stroke: '#000', strokeThickness: 5 }).setDepth(10);
+  keyInventoryText = this.add.text(65, 770, keyInventoryCount, { fontSize: '26px', fill: '#ffe066', fontFamily: 'PFStardustS, Arial, sans-serif', stroke: '#000', strokeThickness: 5 }).setDepth(10);
 
   // Phaser 캔버스 내 인터페이스 생성
   this.add.image(30, 30, 'ico_score').setScale(0.3).setDepth(20);

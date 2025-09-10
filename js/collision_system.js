@@ -30,11 +30,9 @@ class CollisionSystem {
     const keyX = Phaser.Math.Between(60, 420);
     const keyY = y - Phaser.Math.Between(30, 80); // 포션보다 위쪽에서 시작
     const keyObj = keys.create(keyX, keyY, 'key');
-    keyObj.setScale(0.7).setVelocityY(260); // 더 빠른 속도
-    keyObj.setDepth(5);
+    keyObj.setScale(0.7).setVelocityY(260).setDepth(5);
     keyObj.isInventory = false;
-    // 반짝임 효과
-    this.scene.tweens.add({
+    this.scene.tweens.add({ // 반짝임 효과
       targets: keyObj,
       alpha: 0.5,
       duration: 400,
@@ -42,15 +40,13 @@ class CollisionSystem {
       repeat: -1,
       ease: 'Sine.easeInOut'
     });
-    // 회전 효과
-    keyObj.setAngularVelocity(180);
+    keyObj.setAngularVelocity(180); // 회전 효과
     return keyObj;
   }
 
-  // 키와 충돌 시 인벤토리(왼쪽 하단)에 추가
+  // 키와 충돌 시 키 추가
   collectKey(player, keyObj) {
     keyObj.disableBody(true, true);
-    // 키 인벤토리 숫자 증가
     if (typeof keyInventoryCount === 'undefined') keyInventoryCount = 0;
     keyInventoryCount++;
     if (typeof keyInventoryText !== 'undefined' && keyInventoryText) {
@@ -58,35 +54,29 @@ class CollisionSystem {
     }
   }
 
-  // 포션 수집 시 무적 상태 부여
+  // 포션 수집 시 (피버타임)
   collectPotion(player, potion) {
     potion.setAlpha(0.7);
-    setTimeout(() => {
-      if (potion && potion.active) potion.destroy();
-    }, 100);
+    setTimeout(() => (potion && potion.active) && potion.destroy(), 100);
 
     isPlayerInvincible = true;
     player.setTexture('player_fever');
     player.anims.play('fly3', true);
-
+    isFeverTime = true;
     if (this.scene.feverBgm) {
       this.scene.bgm.pause();
       this.scene.feverBgm.play();
     }
-    // 피버타임 시작
-    isFeverTime = true;
-    // 배경을 피버타임용으로 변경
     if (typeof background !== 'undefined' && background && !background.isFever) {
       background.setTexture('bg_fever');
       background.isFever = true;
     }
-    // 피버타임 코인 비 효과 시작
     if (this.scene.spawnSystem && typeof this.scene.spawnSystem.startFeverTimeCoinRain === 'function') {
       this.scene.spawnSystem.startFeverTimeCoinRain();
     }
-
-    // 5초 후 무적 해제
-    this.scene.time.delayedCall(5000, () => {
+    // 피버타임 종료 예약
+    if (this.feverTimer) this.feverTimer.remove();
+    this.feverTimer = this.scene.time.delayedCall(5000, () => {
       isPlayerInvincible = false;
       isFeverTime = false;
       if (player && player.active) {
@@ -102,20 +92,16 @@ class CollisionSystem {
       if (typeof coins !== 'undefined' && coins) {
         coins.children.iterate((coin) => {
           if (coin && coin.active) {
-            // '뿅!' 애니메이션: 스케일 업 + 페이드 아웃 후 destroy
             this.scene.tweens.add({
               targets: coin,
               scale: 1.2,
               alpha: 0,
               duration: 250,
-              onComplete: () => {
-                coin.destroy();
-              }
+              onComplete: () => coin.destroy()
             });
           }
         });
       }
-
       // 피버사운드 종료
       if (this.scene.feverBgm) {
         this.scene.feverBgm.stop();
@@ -138,7 +124,7 @@ class CollisionSystem {
     if (typeof potions === 'undefined' || !potions) {
       potions = this.scene.physics.add.group();
     }
-  const potion = potions.create(x, y, 'potion');
+    const potion = potions.create(x, y, 'potion');
     potion.setScale(0.6);
     potion.setVelocityY(120);
     // 반짝임 효과
@@ -152,6 +138,22 @@ class CollisionSystem {
     });
     // 회전 효과
     potion.setAngularVelocity(360);
+
+    // 포션이 화면 밖으로 나가면 자동 destroy
+    potion.update = () => {
+      if (potion.y > this.scene.scale.height + 40) {
+        potion.destroy();
+      }
+    };
+
+    // 모든 포션에 대해 update 체크 (Phaser 그룹의 iterate 활용)
+    this.scene.events.on('update', () => {
+      potions.children.iterate((potion) => {
+        if (potion && typeof potion.update === 'function') {
+          potion.update();
+        }
+      });
+    });
   }
 
   // 적 체력바 업데이트 공통 함수
@@ -442,15 +444,19 @@ class CollisionSystem {
           if (countdownBox && countdownText) {
             gameOverScreen.classList.add('hidden');
             countdownBox.classList.remove('hidden');
-            
             if (this.scene.successSound) this.scene.successSound.play();
 
             let count = 3;
-            countdownText.textContent = count;
+            countdownText.innerHTML = '';
+            let countdownImg = document.createElement('img');
+            countdownImg.src = `assets/images/count_${count}.png`;
+            countdownImg.style.height = '250px';
+            countdownText.appendChild(countdownImg);
+
             const countdownInterval = setInterval(() => {
               count--;
               if (count > 0) {
-                countdownText.textContent = count;
+                countdownImg.src = `assets/images/count_${count}.png`;
               } else {
                 clearInterval(countdownInterval);
                 countdownBox.classList.add('hidden');
