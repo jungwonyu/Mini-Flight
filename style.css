@@ -158,8 +158,9 @@ button {
   color: #fff;
 }
 
+/* 퀴즈 */
 #quizCard {
-  width: 350px;
+  width: 500px;
   min-height: 340px;
   background: linear-gradient(120deg, #fff 80%, #add8e6 100%);
   border-radius: 30px;
@@ -168,8 +169,14 @@ button {
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  gap: 20px;
   padding: 32px 24px 24px 24px;
   animation: quizCardPop 0.5s cubic-bezier(.68, -0.55, .27, 1.55);
+}
+
+#quizCard button {
+  width: calc(600px / 5);
+  height: calc(300px / 5);
 }
 
 @keyframes quizCardPop {
@@ -189,11 +196,10 @@ button {
 }
 
 #quizTitle {
-  font-size: 2.2rem;
+  font-size: 2rem;
   font-weight: bold;
-  color: #4CAF50;
+  color: #3b79ff;
   margin-bottom: 18px;
-  letter-spacing: 2px;
   text-shadow: 0 2px 8px #add8e6;
 }
 
@@ -203,9 +209,11 @@ button {
   background: #e3f2fd;
   border-radius: 12px;
   padding: 12px 18px;
-  margin-bottom: 18px;
   box-shadow: 0 2px 8px rgba(76, 175, 80, 0.08);
   font-weight: bold;
+  text-align: center;
+  word-break: keep-all;
+  line-height: 1.2;
 }
 
 .userAnswer {
@@ -221,9 +229,8 @@ button {
   height: 56px;
   font-size: 2rem;
   border-radius: 14px;
-  border: 2px solid #4CAF50;
+  border: 2px solid #3b79ff;
   text-align: center;
-  font-family: 'PFStardustS', Arial, sans-serif;
   font-weight: bold;
   background: #fff;
   color: #222;
@@ -234,6 +241,32 @@ button {
 
 .userAnswer input:focus {
   border: 2.5px solid #2196F3;
+}
+
+.quizBox {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+}
+
+.quizImage {
+  width: 200px;
+  height: 200px;
+  background: no-repeat center / contain;
+  border-radius: 20px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+input {
+  width: 200px;
+  height: 80px;
+  text-align: center;
+  font-size: 3rem;
+  font-family: 'PFStardustS', Arial, sans-serif;
+  font-weight: bold;
 }
 
 #finalOverTitle,
@@ -250,31 +283,7 @@ button {
   gap: 10px;
 }
 
-/* 문제 풀이 */
-#quizInfo {
-  width: 300px;
-  height: 300px;
-  border: 1px solid #fff;
-  display: flex;
-  justify-content: space-around;
-  align-items: center;
-  flex-direction: column;
-  font-size: 3rem;
-  background: #000;
-}
 
-.userAnswer {
-  border: 1px solid #fff;
-}
-
-input {
-  width: 200px;
-  height: 80px;
-  text-align: center;
-  font-size: 3rem;
-  font-family: 'PFStardustS', Arial, sans-serif;
-  font-weight: bold;
-}
 
 /* 메인 */
 #gameScreen {

@@ -350,8 +350,10 @@ class CollisionSystem {
 
     // 퀴즈 화면
     const quizScreen = document.getElementById('quizScreen');
+    const gameScreen = document.getElementById('gameScreen');
     const submitButton = document.getElementById('submitButton');
     const questionElement = quizScreen.querySelector('.question');
+    const quizImageElement = quizScreen.querySelector('.quizImage');
     const answerElement = quizScreen.querySelector('.userAnswer input');
 
     // 오답 화면
@@ -364,7 +366,6 @@ class CollisionSystem {
       .then(response => response.json())
       .then(data => {
         quizData = data; // 퀴즈 데이터 저장
-        // 이후 quizData를 활용해 문제 화면 구성 등 가능
       })
       .catch(error => {
         console.error('퀴즈 데이터 로드 실패:', error);
@@ -379,10 +380,11 @@ class CollisionSystem {
         btn.onclick = () => {
           if (this.scene.gameOverBgm) this.scene.gameOverBgm.stop();
           if (this.scene.buttonSound) this.scene.buttonSound.play();
+          gameScreen.classList.add('hidden');
           wrongAnswerScreen.classList.add('hidden');
           gameOverScreen.classList.add('hidden');
           finalOverScreen.classList.add('hidden');
-          if (startScreen) startScreen.classList.remove('hidden');
+          startScreen.classList.remove('hidden');
           gameOverCount = 0;
           this.scene.scene.restart();
         };
@@ -414,6 +416,7 @@ class CollisionSystem {
           const randomNum = Phaser.Math.Between(0, quizData.length - 1);
           const randomQuiz = quizData[randomNum];
           questionElement.textContent = randomQuiz.question; // 랜덤 문제 보여주기
+          quizImageElement.style.backgroundImage = `url(${randomQuiz.image})`; // 이미지 설정
           answerElement.setAttribute('data-answer', randomQuiz.answer); // 정답 저장
         };
       });
