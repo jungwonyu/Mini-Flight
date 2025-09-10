@@ -240,8 +240,17 @@ class CollisionSystem {
   // 점수 업데이트 공통 함수
   updateScore(points) {
     score += points;
-    document.getElementById('score').innerText = score;
-    document.getElementById('gameOverCount').innerText = gameOverCount;
+    // document.getElementById('score').innerText = score;
+    // document.getElementById('gameOverCount').innerText = gameOverCount;
+
+    // if (typeof scoreText !== 'undefined' && scoreText) {
+    //   scoreText.setText('Score: ' + score);
+    // }
+
+    // if (typeof gameOverCountText !== 'undefined' && gameOverCountText) {
+    //   gameOverCountText.setText('Game Over Count: ' + gameOverCount);
+    // }
+
     this.showScorePopup(points);
   }
 
@@ -333,7 +342,8 @@ class CollisionSystem {
     isGameOver = true;
     gameState = 'gameover';
     gameOverCount++;
-    document.getElementById('gameOverCount').innerText = gameOverCount;
+
+    this.scene.gameOverCountText.setText(gameOverCount);
     this.scene.physics.pause();
     player.setTint(GAME_COLORS.GAME_OVER);
 

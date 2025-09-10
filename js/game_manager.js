@@ -47,11 +47,10 @@ class GameManager {
     // UI 텍스트 초기화 (HTML)
     if (typeof scoreText !== 'undefined' && scoreText) {
       scoreText.innerText = 'Score: 0';
-      // scoreText.style.display = 'none';
     }
+
     if (typeof distanceText !== 'undefined' && distanceText) {
       distanceText.innerText = 'Distance: 0m';
-      // distanceText.style.display = 'none';
     }
 
     // 경고 오버레이 숨김
@@ -175,14 +174,9 @@ class GameManager {
 
     // 주행거리 업데이트
     distance += 2;
-    document.getElementById('distance').innerText = Math.floor(distance / 10) + 'm';
-
-
-    // HTML 거리 표시 업데이트
-    // if (typeof distanceText !== 'undefined' && distanceText) {
-    //   distanceText.innerText = 'Distance: ' + Math.floor(distance / 10) + 'm';
-    // }
-
+    if (typeof distanceText !== 'undefined' && distanceText) {
+      distanceText.innerText = 'Distance: ' + Math.floor(distance / 10) + 'm';
+    }
   }
 
   // 보스 스폰 체크

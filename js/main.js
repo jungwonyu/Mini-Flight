@@ -40,6 +40,13 @@ function preload() {
   this.load.audio('successSound', 'assets/sounds/success.mp3');
   this.load.audio('failSound', 'assets/sounds/fail.mp3');
   this.load.audio('buttonSound', 'assets/sounds/button.mp3');
+
+  // interface image
+  this.load.image('ico_score', 'assets/images/ico_score.png');
+  this.load.image('ico_count', 'assets/images/ico_count.png');
+  this.load.image('ico_distance', 'assets/images/ico_distance.png');
+  this.load.image('btn_play', 'assets/images/btn_play.png');
+  this.load.image('btn_pause', 'assets/images/btn_pause.png');
 }
 
 // 게임 오브젝트 생성 및 초기화
@@ -53,38 +60,44 @@ function create() {
   this.collisionSystem = collisionSystem;
   this.gameManager = gameManager;
 
-  const playButton = document.querySelector('.play');
-  const pauseButton = document.querySelector('.pause');
-
-  pauseButton?.addEventListener('click', () => {
-    if (this.physics) this.physics.pause();
-    if (this.time) this.time.paused = true;
-    if (this.tweens) this.tweens.pauseAll();
-    if (this.anims) this.anims.pauseAll();
-    gameState = 'paused';
-    pauseButton.classList.add('hidden');
-    playButton.classList.remove('hidden');
-    if (this.bgm && this.bgm.isPlaying) { this.bgm.pause(); }
-    if (this.feverBgm && this.feverBgm.isPlaying) { this.feverBgm.pause(); }
-  });
-
-  playButton?.addEventListener('click', () => {
-    if (this.physics) this.physics.resume();
-    if (this.time) this.time.paused = false;
-    if (this.tweens) this.tweens.resumeAll();
-    if (this.anims) this.anims.resumeAll();
-    gameState = 'playing';
-    playButton.classList.add('hidden');
-    pauseButton.classList.remove('hidden');
-    if (this.bgm && !this.bgm.isPlaying) { this.bgm.resume(); }
-    if (isFeverTime && this.feverBgm && !this.feverBgm.isPlaying) { this.feverBgm.resume(); }
-  });
-
   // 효과음 객체 생성 및 저장
   this.bgm = this.sound.add('bgm', { loop: true, volume: 0.5 });
   this.feverBgm = this.sound.add('feverBgm');
   this.gameOverBgm = this.sound.add('gameOverBgm');
   this.coinSound = this.sound.add('coinSound');
+  // UI 생성 함수에 play/pause 버튼 추가
+  function createGameUI(scene) {
+    const centerX = scene.scale.width / 2;
+    scene.pauseButton = scene.add.image(centerX, 40, 'btn_pause').setInteractive({ cursor: 'pointer' }).setVisible(true).setScale(0.5).setDepth(100);
+    scene.playButton = scene.add.image(centerX, 40, 'btn_play').setInteractive({ cursor: 'pointer' }).setVisible(false).setScale(0.5).setDepth(100);
+
+    // 버튼 클릭 이벤트
+    scene.playButton.on('pointerdown', () =>{
+      gameState = 'playing';
+      scene.playButton.setVisible(false);
+      scene.pauseButton.setVisible(true);
+      if (scene.physics) scene.physics.resume();
+      if (scene.time) scene.time.paused = false;
+      if (scene.tweens) scene.tweens.resumeAll();
+      if (scene.anims) scene.anims.resumeAll();
+      if (scene.bgm && !scene.bgm.isPlaying) { scene.bgm.resume(); }
+      if (isFeverTime && scene.feverBgm && !scene.feverBgm.isPlaying) { scene.feverBgm.resume(); }
+    });
+
+    scene.pauseButton.on('pointerdown', () =>{
+      gameState = 'paused';
+      scene.pauseButton.setVisible(false);
+      scene.playButton.setVisible(true);
+      if (scene.physics) scene.physics.pause();
+      if (scene.time) scene.time.paused = true;
+      if (scene.tweens) scene.tweens.pauseAll();
+      if (scene.anims) scene.anims.pauseAll();
+      if (scene.bgm && scene.bgm.isPlaying) { scene.bgm.pause(); }
+      if (scene.feverBgm && scene.feverBgm.isPlaying) { scene.feverBgm.pause(); }
+    });
+  }
+
+  createGameUI(this);
   this.explosionSound = this.sound.add('explosionSound');
   this.powerupSound = this.sound.add('powerupSound');
   this.enemyHitSound = this.sound.add('enemyHitSound');
@@ -170,13 +183,36 @@ function create() {
   keyInventoryIcon = this.add.image(40, 780, 'key').setScale(0.5).setDepth(10);
   keyInventoryText = this.add.text(65, 770, keyInventoryCount, { fontSize: '22px', fill: '#ffe066', fontFamily: 'PFStardustS, Arial, sans-serif', stroke: '#000', strokeThickness: 5 }).setDepth(10);
 
-  const scoreElement = document.getElementById('score');
-  const gameOverCountElement = document.getElementById('gameOverCount');
-  const distanceElement = document.getElementById('distance');
+  // Phaser 캔버스 내 인터페이스 생성
+  this.add.image(30, 30, 'ico_score').setScale(0.3).setDepth(20);
+  this.scoreText = this.add.text(50, 20, score, {
+    fontSize: '26px',
+    fill: '#fff',
+    fontFamily: 'PFStardustS, Arial, sans-serif',
+    fontWeight: 'bold',
+    stroke: '#000',
+    strokeThickness: 5
+  }).setDepth(20);
 
-  scoreElement.innerText = score;
-  gameOverCountElement.innerText = gameOverCount;
-  distanceElement.innerText = distance;
+  this.add.image(30, 70, 'ico_count').setScale(0.3).setDepth(20);
+  this.gameOverCountText = this.add.text(50, 60, gameOverCount, {
+    fontSize: '26px',
+    fill: '#ff6666',
+    fontFamily: 'PFStardustS, Arial, sans-serif',
+    fontWeight: 'bold',
+    stroke: '#000',
+    strokeThickness: 5
+  }).setDepth(20);
+
+  this.add.image(380, 50, 'ico_distance').setScale(0.3).setDepth(20);
+  this.distanceText = this.add.text(400, 40, Math.floor(distance / 10) + 'm', {
+    fontSize: '28px',
+    fill: '#fff',
+    fontFamily: 'PFStardustS, Arial, sans-serif',
+    fontWeight: 'bold',
+    stroke: '#000',
+    strokeThickness: 5
+  }).setDepth(20);
 
   // 경고 오버레이
   warningOverlay = this.add.rectangle(240, 400, 480, 800, 0xff0000, 0.8);
@@ -201,6 +237,11 @@ function update(time) {
   inputSystem.handleWeaponSystem(time);
   gameManager.cleanupOffscreenObjects();
   gameManager.updateCoinAnimations();
+
+  // Phaser UI에 값 업데이트
+  if (this.scoreText) this.scoreText.setText(score);
+  if (this.distanceText) this.distanceText.setText(Math.floor(distance / 10) + 'm');
+  if (this.gameOverCountText) this.gameOverCountText.setText(gameOverCount);
 }
 
 // HTML 시작 버튼 이벤트 연결
@@ -223,9 +264,10 @@ function setupStartButton() {
 function startGame() {
   // 완전한 게임 상태 초기화 (다시하기와 동일)
   gameManager.resetGameState();
-  // 점수 UI도 0으로 초기화
-  const scoreElement = document.getElementById('score');
-  if (scoreElement) scoreElement.innerText = 0;
+  // Phaser UI도 0으로 초기화
+  if (this.scoreText) this.scoreText.setText(0);
+  if (this.distanceText) this.distanceText.setText('0m');
+  if (this.gameOverCountText) this.gameOverCountText.setText(0);
   
   // 게임 상태를 playing으로 변경
   gameState = 'playing';
