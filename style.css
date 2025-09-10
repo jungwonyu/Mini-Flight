@@ -42,11 +42,12 @@ button {
   padding-bottom: 10px;
   background: url('assets/images/button.png') no-repeat center / cover;
   cursor: pointer;
+  text-shadow: -2px 0px #000, 0px 2px #000, 2px 0px #000, 0px -2px #000;
 }
 
-/* button:hover {
+button:hover {
   transform: translateY(-2px);
-} */
+}
 
 .hidden {
   display: none !important;
@@ -108,14 +109,12 @@ button {
 }
 
 #gameTitle {
+  top: 200px;
   font-size: 6rem;
   font-weight: bold;
   position: absolute;
-  top: 200px;
-  background: #000;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: #fff;
+  text-shadow: -2px 0px #000, 0px 2px #000, 2px 0px #000, 0px -2px #000;
 }
 
 @media (max-width: 480px) {
@@ -214,6 +213,7 @@ button {
   text-align: center;
   word-break: keep-all;
   line-height: 1.2;
+  flex: 1;
 }
 
 .userAnswer {
@@ -255,7 +255,7 @@ button {
 .quizImage {
   width: 200px;
   height: 200px;
-  background: no-repeat center / contain;
+  background: no-repeat center / cover;
   border-radius: 20px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
@@ -282,7 +282,6 @@ input {
   flex-direction: row;
   gap: 10px;
 }
-
 
 
 /* 메인 */
