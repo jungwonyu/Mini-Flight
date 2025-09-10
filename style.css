@@ -136,6 +136,116 @@ button:hover {
     font-size: 0.8rem;
     padding: 0 20px;
   }
+
+  canvas {
+    width: 100vw !important;
+    height: 100vh !important;
+    max-width: 100vw !important;
+    max-height: 100vh !important;
+  }
+
+  .interfaceBox {
+    width: 95vw !important;
+    min-width: 0 !important;
+    height: auto !important;
+    padding: 4vw 2vw !important;
+    font-size: 1rem !important;
+    box-sizing: border-box;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+  }
+
+  .interfaceBox div {
+    font-size: 1rem !important;
+    width: 33vw !important;
+    min-width: 0 !important;
+    padding: 0 !important;
+  }
+
+  .interfaceBox .playBox button {
+    width: 32px !important;
+    height: 32px !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+  }
+
+  .ico {
+    width: 24px !important;
+    height: 24px !important;
+    margin-right: 6px !important;
+  }
+
+  #quizCard {
+    width: 90vw !important;
+    min-height: 220px !important;
+    padding: 16px 8px 12px 8px !important;
+    gap: 10px !important;
+    border-radius: 18px !important;
+  }
+
+  #quizTitle {
+    font-size: 1.2rem !important;
+    margin-bottom: 10px !important;
+  }
+
+  .question {
+    font-size: 1.1rem !important;
+    padding: 8px 10px !important;
+    border-radius: 8px !important;
+  }
+
+  .quizImage {
+    width: 90px !important;
+    height: 90px !important;
+    border-radius: 10px !important;
+  }
+
+  .userAnswer input {
+    width: 90px !important;
+    height: 32px !important;
+    font-size: 1.1rem !important;
+    border-radius: 8px !important;
+  }
+
+  input {
+    width: 90px !important;
+    height: 32px !important;
+    font-size: 1.1rem !important;
+    border-radius: 8px !important;
+  }
+
+  #finalOverTitle,
+  #gameOverTitle,
+  #gameOverInfo,
+  #wrongAnswerInfo {
+    font-size: 2.5rem !important;
+    margin-bottom: 1.2rem !important;
+    font-weight: bold !important;
+    text-shadow: 0 2px 8px #000, 0 0 20px #fff;
+  }
+
+  .buttonBox button {
+    font-size: 1.7rem !important;
+    width: 160px !important;
+    height: 64px !important;
+    padding: 0 !important;
+    background-size: contain !important;
+  }
+
+  .interfaceBox .playBox button {
+    width: 64px !important;
+    height: 64px !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    font-size: 2rem !important;
+  }
+
+  .interfaceBox .playBox button {
+    width: 48px !important;
+    height: 48px !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+  }
 }
 
 #gameOverScreen,
@@ -270,10 +380,11 @@ input {
 }
 
 #finalOverTitle,
+#wrongAnswerTitle,
 #gameOverTitle,
 #gameOverInfo,
 #wrongAnswerInfo {
-  font-size: 2.5rem;
+  font-size: 2rem;
   margin-bottom: 1rem;
 }
 
@@ -283,6 +394,19 @@ input {
   gap: 10px;
 }
 
+/* 오답 */
+#wrongAnswerScreen .playerImage {
+  width: 150px;
+  height: 150px;
+  background: url('assets/images/player_fail.png') no-repeat center / contain;
+}
+
+/* 키부족 */
+#finalOverScreen .playerImage {
+  width: 150px;
+  height: 150px;
+  background: url('assets/images/player_noKey.png') no-repeat center / contain;
+}
 
 /* 메인 */
 .interfaceBox {
