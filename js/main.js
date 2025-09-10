@@ -112,58 +112,16 @@ function create() {
   this.failSound = this.sound.add('failSound');
   this.buttonSound = this.sound.add('buttonSound');
 
-  // 배경을 tileSprite로 복구
   background = this.add.tileSprite(0, 0, 480, 800, 'bg').setOrigin(0);
   background.isFever = false;
 
-  this.anims.create({
-    key: 'fly',
-    frames: this.anims.generateFrameNumbers('player', { start: 0, end: 1 }),
-    frameRate: 5,
-    repeat: -1
-  });
-
-  this.anims.create({
-    key: 'fly2',
-    frames: this.anims.generateFrameNumbers('player_double', { start: 0, end: 1 }),
-    frameRate: 5,
-    repeat: -1
-  });
-
-  this.anims.create({
-    key: 'fly3',
-    frames: this.anims.generateFrameNumbers('player_fever', { start: 0, end: 1 }),
-    frameRate: 5,
-    repeat: -1
-  });
-
-  this.anims.create({
-    key: 'coin',
-    frames: this.anims.generateFrameNumbers('coin', { start: 0, end: 1 }),
-    frameRate: 5,
-    repeat: -1
-  });
-
-  this.anims.create({
-    key: 'enemyFly',
-    frames: this.anims.generateFrameNumbers('enemy', { start: 0, end: 1 }),
-    frameRate: 5,
-    repeat: -1
-  });
-
-  this.anims.create({
-    key: 'king_enemyFly',
-    frames: this.anims.generateFrameNumbers('king_enemy', { start: 0, end: 4 }),
-    frameRate: 5,
-    repeat: -1
-  });
-
-  this.anims.create({
-    key: 'king_king_enemyFly',
-    frames: this.anims.generateFrameNumbers('king_king_enemy', { start: 0, end: 5 }),
-    frameRate: 5,
-    repeat: -1
-  });
+  this.anims.create({ key: 'fly', frames: this.anims.generateFrameNumbers('player', { start: 0, end: 1 }), frameRate: 5, repeat: -1 });
+  this.anims.create({ key: 'fly2', frames: this.anims.generateFrameNumbers('player_double', { start: 0, end: 1 }), frameRate: 5, repeat: -1 });
+  this.anims.create({ key: 'fly3', frames: this.anims.generateFrameNumbers('player_fever', { start: 0, end: 1 }), frameRate: 5, repeat: -1 });
+  this.anims.create({ key: 'coin', frames: this.anims.generateFrameNumbers('coin', { start: 0, end: 1 }), frameRate: 5, repeat: -1 });
+  this.anims.create({ key: 'enemyFly', frames: this.anims.generateFrameNumbers('enemy', { start: 0, end: 1 }), frameRate: 5, repeat: -1 });
+  this.anims.create({ key: 'king_enemyFly', frames: this.anims.generateFrameNumbers('king_enemy', { start: 0, end: 4 }), frameRate: 5, repeat: -1 });
+  this.anims.create({ key: 'king_king_enemyFly', frames: this.anims.generateFrameNumbers('king_king_enemy', { start: 0, end: 5 }), frameRate: 5, repeat: -1 });
 
   player = this.physics.add.sprite(240, 720, 'player')
   player.anims.play('fly', true);
@@ -185,7 +143,7 @@ function create() {
   potions = this.physics.add.group();
   keys = this.physics.add.group();
 
-  // 화면 왼쪽 하단에 key 아이콘 1개와 x3 숫자 표시
+  // 화면 왼쪽 하단에 key
   keyInventoryCount = 3;
   keyInventoryIcon = this.add.image(40, 780, 'key').setScale(0.5).setDepth(10);
   keyInventoryText = this.add.text(65, 770, keyInventoryCount, { fontSize: '26px', fill: '#ffe066', fontFamily: 'PFStardustS, Arial, sans-serif', stroke: '#000', strokeThickness: 5 }).setDepth(10);
@@ -256,7 +214,6 @@ function setupStartButton() {
   const startButton = document.getElementById('startButton');
   const startScreen = document.getElementById('startScreen');
   const gameScreen = document.getElementById('gameScreen');
-  // const canvas = document.querySelector('canvas');
   
   if (startButton) {
     startButton.addEventListener('click', () => {
@@ -288,12 +245,7 @@ function startGame() {
   isFeverTime = false;
   spawnSystem.spawnPowerup();  // 첫 powerup 즉시 스폰
 
-  // 피버타임 코인 비 효과도 즉시 시작 (피버타임 상태일 때만)
-  // if (isFeverTime) spawnSystem.startFeverTimeCoinRain();
-  // 배경음악 재생 (이미 재생 중이면 중복 방지)
-  if (this.bgm && !this.bgm.isPlaying) {
-    this.bgm.play();
-  }
+  if (this.bgm && !this.bgm.isPlaying) this.bgm.play();
 }
 
 // 스폰 시작
@@ -319,16 +271,14 @@ function setupCollisions() {
   this.physics.add.overlap(player, kingEnemies, (player, kingEnemy) => collisionSystem.playerHit(player, kingEnemy), null, this);
   this.physics.add.overlap(player, kingKingEnemies, (player, kingKingEnemy) => collisionSystem.playerHit(player, kingKingEnemy), null, this);
 
-  // 플레이어 vs 총알
+  // 플레이어 vs 총알 
   this.physics.add.overlap(player, enemyBullets, (player, enemyBullet) => collisionSystem.playerHitByBullet(player, enemyBullet), null, this);
 
   // 수집 아이템들
   this.physics.add.overlap(player, coins, (player, coin) => collisionSystem.collectCoin(player, coin), null, this);
   this.physics.add.overlap(player, powerups, (player, powerup) => collisionSystem.collectPowerup(player, powerup), null, this);
   this.physics.add.overlap(player, potions, (player, potion) => collisionSystem.collectPotion(player, potion), null, this);
-  this.physics.add.overlap(player, keys, (player, keyObj) => {
-    if (!keyObj.isInventory) collisionSystem.collectKey(player, keyObj)
-  }, null, this);
+  this.physics.add.overlap(player, keys, (player, keyObj) => (!keyObj.isInventory) && collisionSystem.collectKey(player, keyObj), null, this);
 }
 
 // 게임 시작

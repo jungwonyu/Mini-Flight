@@ -1,25 +1,23 @@
 // 적, 파워업, 총알 스폰 시스템
 
 class SpawnSystem {
-  // 스폰 시스템 재개 (resume)
-  resumeSpawning() {
+  resumeSpawning() { // 스폰 시스템 재개 (resume)
   this.clearAllTimers();
   this.isActive = true;
   this.startSpawning();
-  // 이어하기 직후 파워업 강제 스폰
   this.hasPowerupActive = false;
   this.spawnPowerup();
   }
-  // key 오브젝트 스폰
-  spawnKey() {
+
+  
+  spawnKey() { // key 오브젝트 스폰
     if (typeof keys === 'undefined' || !keys) {
       keys = this.scene.physics.add.group();
     }
     const x = Phaser.Math.Between(60, 420);
     const keyObj = keys.create(x, -40, 'key');
     keyObj.setScale(0.7).setVelocityY(160);
-    // 반짝임 효과
-    this.scene.tweens.add({
+    this.scene.tweens.add({ // 반짝임 효과
       targets: keyObj,
       alpha: 0.5,
       duration: 400,
@@ -27,8 +25,7 @@ class SpawnSystem {
       repeat: -1,
       ease: 'Sine.easeInOut',
     });
-    // 회전 효과
-    keyObj.setAngularVelocity(180);
+    keyObj.setAngularVelocity(180); // 회전 효과
     return keyObj;
   }
 
@@ -207,7 +204,6 @@ class SpawnSystem {
   // 일반 적 스폰
   spawnEnemies() {
     if (isGameOver || !this.isActive || isKingKingEnemyActive) return;
-
     // 피버타임이면 적 더 많이, 더 자주 스폰
     let fever = typeof isFeverTime !== 'undefined' && isFeverTime;
     // 피버타임이면 적 스폰 중단, 동전만 떨어지게
@@ -234,9 +230,7 @@ class SpawnSystem {
     }
 
     // 다음 스폰 예약
-    this.enemyTimer = this.scheduleNextSpawn(
-      () => this.spawnEnemies(), 1500, 3000
-    );
+    this.enemyTimer = this.scheduleNextSpawn(() => this.spawnEnemies(), 1500, 3000);
   }
 
   // 적 총알 스폰
@@ -262,11 +256,7 @@ class SpawnSystem {
     });
 
     // 다음 스폰 예약
-    this.bulletTimer = this.scheduleNextSpawn(
-      () => this.spawnEnemyBullets(),
-      5000,
-      10000
-    );
+    this.bulletTimer = this.scheduleNextSpawn(() => this.spawnEnemyBullets(), 5000, 10000);
   }
 
   // 킹 에너미 스폰
@@ -555,9 +545,11 @@ class SpawnSystem {
   }
 
   // 경고 효과 생성 헬퍼 함수
-  createWarningEffect(alpha, duration, repeat, callback) {
-    warningOverlay.setVisible(true);
-    warningOverlay.setAlpha(alpha);
+  createWarningEffect(alpha, duration, repeat, callback, isOverlay = true) {
+    if (isOverlay) {
+      warningOverlay.setVisible(true);
+      warningOverlay.setAlpha(alpha);
+    }
 
     this.scene.tweens.add({
       targets: warningOverlay,

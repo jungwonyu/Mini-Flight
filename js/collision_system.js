@@ -450,7 +450,7 @@ class CollisionSystem {
             countdownText.innerHTML = '';
             let countdownImg = document.createElement('img');
             countdownImg.src = `assets/images/count_${count}.png`;
-            countdownImg.style.height = '250px';
+            countdownImg.style.height = '400px';
             countdownText.appendChild(countdownImg);
 
             const countdownInterval = setInterval(() => {
@@ -574,7 +574,7 @@ class CollisionSystem {
   dropCoins(x, y, coinCount) {
     for (let i = 0; i < coinCount; i++) {
       const coin = coins.create( x + Phaser.Math.Between(-40, 40), y + Phaser.Math.Between(-30, 30), 'coin');
-      coin.setScale(0.7).setVelocityY(200).setVelocityX(Phaser.Math.Between(-120, 120)); // 코인 크기 증가
+      coin.setScale(1.0).setVelocityY(200).setVelocityX(Phaser.Math.Between(-120, 120)); // 코인 크기 증가
       coin.coinRotation = 0;
     }
   }
